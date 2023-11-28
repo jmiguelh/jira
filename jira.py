@@ -20,7 +20,6 @@ total = 1000
 while inicio < total:
     issues = jira.jql(jql_request, limit=passo, start=inicio)
     inicio = issues["startAt"] + passo
-
     total = issues["total"]
     cards.extend(issues["issues"])
 
@@ -28,6 +27,19 @@ while inicio < total:
 i = 0
 for card in cards:
     i += 1
-    print(i, card["key"], card["fields"]["issuetype"]["name"])
+    print(
+        i,
+        card["fields"]["issuetype"]["name"],
+        card["key"],
+        card["fields"]["summary"],
+        card["fields"]["priority"]["name"],
+        card["fields"]["status"]["name"],
+        card["fields"]["created"],
+        card["fields"]["updated"],
+        card["fields"]["parent"]["fields"]["summary"] if "parent" in card else "",
+        card["fields"]["timespent"],
+        card["fields"]["status"]["statusCategory"]["name"],
+        card["fields"]["statuscategorychangedate"],
+    )
 
 # jira.issue_worklog()
