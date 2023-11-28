@@ -41,7 +41,9 @@ def listar_cards(cards: "dict"):
             card["fields"]["status"]["name"],
             card["fields"]["created"],
             card["fields"]["updated"],
-            card["fields"]["parent"]["fields"]["summary"] if "parent" in card else "",
+            card["fields"]["parent"]["fields"]["summary"]
+            if "parent" in card["fields"]
+            else "",
             card["fields"]["timespent"],
             card["fields"]["status"]["statusCategory"]["name"],
             card["fields"]["statuscategorychangedate"],
@@ -62,8 +64,8 @@ def inserir_db(cards: "dict"):
                 "Criado": card["fields"]["created"],
                 "Atualizado": card["fields"]["updated"],
                 "Epico": card["fields"]["parent"]["fields"]["summary"]
-                if "parent" in card
-                else "",
+                if "parent" in card["fields"]
+                else None,
                 "Controle de tempo": card["fields"]["timespent"],
                 "Categoria do status": card["fields"]["status"]["statusCategory"][
                     "name"
@@ -76,6 +78,7 @@ def inserir_db(cards: "dict"):
 
 
 if __name__ == "__main__":
-    inserir_db(carrega_jira())
+    cards = carrega_jira()
+    inserir_db(cards)
 
 # jira.issue_worklog()
