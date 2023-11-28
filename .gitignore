@@ -136,3 +136,4 @@ dmypy.json
 .vscode
 
 tmp/
+db.json
