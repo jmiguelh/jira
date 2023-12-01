@@ -56,23 +56,20 @@ def inserir_db(cards: "dict"):
     for card in cards:
         db.insert(
             {
-                "Tipo de item": card["fields"]["issuetype"]["name"],
-                "Chave": card["key"],
-                "Resumo": card["fields"]["summary"],
-                "Prioridade": card["fields"]["priority"]["name"],
-                "Status": card["fields"]["status"]["name"],
-                "Criado": card["fields"]["created"],
-                "Atualizado": card["fields"]["updated"],
-                "Epico": card["fields"]["parent"]["fields"]["summary"]
+                "tipo de item": card["fields"]["issuetype"]["name"],
+                "chave": card["key"],
+                "resumo": card["fields"]["summary"],
+                "prioridade": card["fields"]["priority"]["name"],
+                "status": card["fields"]["status"]["name"],
+                "status_agrupado": card["fields"]["status"]["description"],
+                "criado": card["fields"]["created"],
+                "atualizado": card["fields"]["updated"],
+                "epico": card["fields"]["parent"]["fields"]["summary"]
                 if "parent" in card["fields"]
                 else None,
-                "Controle de tempo": card["fields"]["timespent"],
-                "Categoria do status": card["fields"]["status"]["statusCategory"][
-                    "name"
-                ],
-                "Categoria do status alterada": card["fields"][
-                    "statuscategorychangedate"
-                ],
+                "tempo": card["fields"]["timespent"],
+                "categoria": card["fields"]["status"]["statusCategory"]["name"],
+                "categoria_alterada": card["fields"]["statuscategorychangedate"],
             }
         )
 
