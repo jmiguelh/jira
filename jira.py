@@ -3,10 +3,10 @@ from dotenv import load_dotenv
 from atlassian import Jira
 from tinydb import TinyDB, Query
 
+load_dotenv()
 
-def carrega_jira() -> dict:
-    load_dotenv()
 
+def carrega_cards() -> dict:
     jira = Jira(
         url=os.getenv("BASE_URL"),
         username=os.getenv("JIRA_EMAIL"),
@@ -17,15 +17,59 @@ def carrega_jira() -> dict:
     jql_request = "PROJECT IN (SFS) and type not in (subTaskIssueTypes(),Epic) AND status != Cancelled AND key != SFS-272 and status != Reprovado"
 
     cards = []
+    campos = [
+        "issueId",
+        "issuetype",
+        "summary",
+        "priority",
+        "status",
+        "created",
+        "updated",
+        "parent",
+        "timespent",
+        "statuscategorychangedate",
+    ]
     inicio = 0
     passo = 100
     total = 1000
     while inicio < total:
-        issues = jira.jql(jql_request, limit=passo, start=inicio)
+        issues = jira.jql(
+            jql_request,
+            limit=passo,
+            start=inicio,
+            fields=campos,
+        )
         inicio = issues["startAt"] + passo
         total = issues["total"]
         cards.extend(issues["issues"])
     return cards
+
+
+def carrega_apropriacoes():
+    jira = Jira(
+        url=os.getenv("BASE_URL"),
+        username=os.getenv("JIRA_EMAIL"),
+        password=os.getenv("API_KEY"),
+        cloud=True,
+    )
+
+    apropriacoes = jira.get_updated_worklogs(since=1701399600)
+
+    fim = apropriacoes["lastPage"]
+    proxima = apropriacoes["until"] + 1
+    ids = []
+    for apropriacao in apropriacoes["values"]:
+        ids.append(apropriacao["worklogId"])
+
+    apropriacoes = jira.get_worklogs(ids)
+
+    for apropriacao in apropriacoes:
+        ...
+        # apropriacao["Id"]
+        # apropriacao["issueId"]
+        # apropriacao["started"]
+        # apropriacao["timeSpentSeconds"]
+        # apropriacao["author"]["displayName"]
 
 
 def listar_cards(cards: "dict"):
@@ -75,7 +119,10 @@ def inserir_db(cards: "dict"):
 
 
 if __name__ == "__main__":
-    cards = carrega_jira()
-    inserir_db(cards)
+    ...
 
-# jira.issue_worklog()
+    # cards = carrega_jira()
+    # listar_cards(cards)
+
+    # print(jira.csv(jql_request, all_fields=True))
+    # jira.issue_worklog()
