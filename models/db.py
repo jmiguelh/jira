@@ -28,7 +28,8 @@ class Apropriacao(db.Entity):
     card_id = Required(int)
     inicio = Required(datetime)
     tempo = Required(int)
-    nome = Required(str, 100)
+    nome = Required(str, 150)
+    alterado = Required(datetime)
 
 
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)

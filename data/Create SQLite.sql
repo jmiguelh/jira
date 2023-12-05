@@ -3,7 +3,8 @@ CREATE TABLE "jira_apropriacao" (
   "card_id" INTEGER NOT NULL,
   "inicio" DATETIME NOT NULL,
   "tempo" INTEGER NOT NULL,
-  "nome" VARCHAR(100) NOT NULL
+  "nome" VARCHAR(150) NOT NULL,
+  "alterado" DATETIME NOT NULL
 );
 
 CREATE TABLE "jira_card" (

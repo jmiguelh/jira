@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 from atlassian import Jira
 from models.db import *
 from datetime import datetime
+import time
 
 FORMATO_DATA = "%Y-%m-%dT%H:%M:%S"
 
@@ -48,7 +49,7 @@ def carrega_cards() -> dict:
     return cards
 
 
-def carrega_apropriacoes():
+def carrega_apropriacoes() -> dict:
     jira = Jira(
         url=os.getenv("BASE_URL"),
         username=os.getenv("JIRA_EMAIL"),
@@ -56,23 +57,18 @@ def carrega_apropriacoes():
         cloud=True,
     )
 
-    apropriacoes = jira.get_updated_worklogs(since=1701399600)
+    with db_session:
+        ultima = time.mktime(max(a.alterado for a in Apropriacao).timetuple())
 
-    fim = apropriacoes["lastPage"]
-    proxima = apropriacoes["until"] + 1
+    apropriacoes = jira.get_updated_worklogs(since=ultima + 1)
+
     ids = []
     for apropriacao in apropriacoes["values"]:
         ids.append(apropriacao["worklogId"])
 
     apropriacoes = jira.get_worklogs(ids)
 
-    for apropriacao in apropriacoes:
-        ...
-        # apropriacao["Id"]
-        # apropriacao["issueId"]
-        # apropriacao["started"]
-        # apropriacao["timeSpentSeconds"]
-        # apropriacao["author"]["displayName"]
+    return apropriacoes
 
 
 def listar_cards(cards: "dict"):
@@ -97,7 +93,7 @@ def listar_cards(cards: "dict"):
         )
 
 
-def inserir_db(cards: "dict"):
+def inserir_db_cards(cards: "dict"):
     with db_session:
         for card in cards:
             c = Card.get(id=card["id"])
@@ -156,6 +152,18 @@ def inserir_db(cards: "dict"):
                 )
 
 
+def inserir_db_apropriacoes(apropriacoes: "dict"):
+    with db_session:
+        for apropriacao in apropriacoes:
+            Apropriacao(
+                id=apropriacao["id"],
+                card_id=apropriacao["issueId"],
+                inicio=datetime.strptime(apropriacao["started"][:19], FORMATO_DATA),
+                tempo=apropriacao["timeSpentSeconds"],
+                nome=apropriacao["author"]["displayName"],
+                alterado=datetime.strptime(apropriacao["updated"][:19], FORMATO_DATA),
+            )
+
+
 if __name__ == "__main__":
-    cards = carrega_cards()
-    inserir_db(cards)
+    inserir_db_apropriacoes(carrega_apropriacoes())
