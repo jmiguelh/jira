@@ -1,7 +1,9 @@
 import os
 from dotenv import load_dotenv
 from atlassian import Jira
-from tinydb import TinyDB, Query
+from models.db import *
+from datetime import datetime
+
 
 load_dotenv()
 
@@ -95,34 +97,29 @@ def listar_cards(cards: "dict"):
 
 
 def inserir_db(cards: "dict"):
-    db = TinyDB("data/db.json")
-    db.truncate()
-    for card in cards:
-        db.insert(
-            {
-                "tipo de item": card["fields"]["issuetype"]["name"],
-                "chave": card["key"],
-                "resumo": card["fields"]["summary"],
-                "prioridade": card["fields"]["priority"]["name"],
-                "status": card["fields"]["status"]["name"],
-                "status_agrupado": card["fields"]["status"]["description"],
-                "criado": card["fields"]["created"],
-                "atualizado": card["fields"]["updated"],
-                "epico": card["fields"]["parent"]["fields"]["summary"]
+    date_format = "%Y-%m-%d"
+    with db_session:
+        for card in cards:
+            Card(
+                id=card["id"],
+                tipo=card["fields"]["issuetype"]["name"],
+                chave=card["key"],
+                desricao=card["fields"]["summary"],
+                prioridade=card["fields"]["priority"]["name"],
+                status=card["fields"]["status"]["name"],
+                status_agrupado=card["fields"]["status"]["description"],
+                criado=datetime.strptime(card["fields"]["created"][:10], date_format),
+                alterado=datetime.strptime(card["fields"]["updated"][:10], date_format),
+                pai=card["fields"]["parent"]["fields"]["summary"]
                 if "parent" in card["fields"]
-                else None,
-                "tempo": card["fields"]["timespent"],
-                "categoria": card["fields"]["status"]["statusCategory"]["name"],
-                "categoria_alterada": card["fields"]["statuscategorychangedate"],
-            }
-        )
+                else "",
+                tempo_total=card["fields"]["timespent"],
+                categoria=card["fields"]["status"]["statusCategory"]["name"],
+                categoria_alterada=datetime.strptime(
+                    card["fields"]["statuscategorychangedate"][:10], date_format
+                ),
+            )
 
 
 if __name__ == "__main__":
-    ...
-
-    # cards = carrega_jira()
-    # listar_cards(cards)
-
-    # print(jira.csv(jql_request, all_fields=True))
-    # jira.issue_worklog()
+    inserir_db(carrega_cards())
