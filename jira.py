@@ -4,6 +4,7 @@ from atlassian import Jira
 from models.db import *
 from datetime import datetime
 
+FORMATO_DATA = "%Y-%m-%dT%H:%M:%S"
 
 load_dotenv()
 
@@ -97,29 +98,64 @@ def listar_cards(cards: "dict"):
 
 
 def inserir_db(cards: "dict"):
-    date_format = "%Y-%m-%d"
     with db_session:
         for card in cards:
-            Card(
-                id=card["id"],
-                tipo=card["fields"]["issuetype"]["name"],
-                chave=card["key"],
-                desricao=card["fields"]["summary"],
-                prioridade=card["fields"]["priority"]["name"],
-                status=card["fields"]["status"]["name"],
-                status_agrupado=card["fields"]["status"]["description"],
-                criado=datetime.strptime(card["fields"]["created"][:10], date_format),
-                alterado=datetime.strptime(card["fields"]["updated"][:10], date_format),
-                pai=card["fields"]["parent"]["fields"]["summary"]
-                if "parent" in card["fields"]
-                else "",
-                tempo_total=card["fields"]["timespent"],
-                categoria=card["fields"]["status"]["statusCategory"]["name"],
-                categoria_alterada=datetime.strptime(
-                    card["fields"]["statuscategorychangedate"][:10], date_format
-                ),
-            )
+            c = Card.get(id=card["id"])
+            if not c == None:
+                if not c.alterado == datetime.strptime(
+                    card["fields"]["updated"][:19], FORMATO_DATA
+                ):
+                    c.tipo = card["fields"]["issuetype"]["name"]
+                    c.desricao = card["fields"]["summary"]
+                    c.prioridade = card["fields"]["priority"]["name"]
+                    c.status = card["fields"]["status"]["name"]
+                    c.status_agrupado = card["fields"]["status"]["description"]
+                    c.alterado = datetime.strptime(
+                        card["fields"]["updated"][:19], FORMATO_DATA
+                    )
+                    c.pai = (
+                        card["fields"]["parent"]["fields"]["summary"]
+                        if "parent" in card["fields"]
+                        else ""
+                    )
+                    c.tempo_total = card["fields"]["timespent"]
+                    c.categoria = (
+                        card["fields"]["status"]["statusCategory"]["name"]
+                        if not card["fields"]["status"]["name"] == "Concluído"
+                        else "Concluído"
+                    )
+                    c.categoria_alterada = datetime.strptime(
+                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                    )
+
+            else:
+                Card(
+                    id=card["id"],
+                    tipo=card["fields"]["issuetype"]["name"],
+                    chave=card["key"],
+                    desricao=card["fields"]["summary"],
+                    prioridade=card["fields"]["priority"]["name"],
+                    status=card["fields"]["status"]["name"],
+                    status_agrupado=card["fields"]["status"]["description"],
+                    criado=datetime.strptime(
+                        card["fields"]["created"][:19], FORMATO_DATA
+                    ),
+                    alterado=datetime.strptime(
+                        card["fields"]["updated"][:19], FORMATO_DATA
+                    ),
+                    pai=card["fields"]["parent"]["fields"]["summary"]
+                    if "parent" in card["fields"]
+                    else "",
+                    tempo_total=card["fields"]["timespent"],
+                    categoria=card["fields"]["status"]["statusCategory"]["name"]
+                    if not card["fields"]["status"]["name"] == "Concluído"
+                    else "Concluído",
+                    categoria_alterada=datetime.strptime(
+                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                    ),
+                )
 
 
 if __name__ == "__main__":
-    inserir_db(carrega_cards())
+    cards = carrega_cards()
+    inserir_db(cards)

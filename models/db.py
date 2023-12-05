@@ -33,4 +33,4 @@ class Apropriacao(db.Entity):
 
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
-db.generate_mapping()
+db.generate_mapping(create_tables=True)
