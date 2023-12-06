@@ -32,6 +32,15 @@ class Apropriacao(db.Entity):
     alterado = Required(datetime)
 
 
+class Status(db.Entity):
+    _table_ = "jira_status"
+    id = PrimaryKey(int)
+    chave = Required(str, 10)
+    de = Required(str, 50)
+    para = Required(str, 50)
+    datahora = Required(datetime)
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)

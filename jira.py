@@ -71,6 +71,26 @@ def carrega_apropriacoes() -> dict:
     return apropriacoes
 
 
+def carrega_status(chave: "str"):
+    jira = Jira(
+        url=os.getenv("BASE_URL"),
+        username=os.getenv("JIRA_EMAIL"),
+        password=os.getenv("API_KEY"),
+        cloud=True,
+    )
+    status = jira.get_issue_changelog(chave, limit=5000)
+
+    for s in status["histories"]:
+        if s["items"][0]["field"] == "status":
+            inserir_db_status(
+                s["id"],
+                chave,
+                s["items"][0]["fromString"],
+                s["items"][0]["toString"],
+                s["created"],
+            )
+
+
 def listar_cards(cards: "dict"):
     i = 0
     for card in cards:
@@ -101,6 +121,7 @@ def inserir_db_cards(cards: "dict"):
                 if not c.alterado == datetime.strptime(
                     card["fields"]["updated"][:19], FORMATO_DATA
                 ):
+                    # Atualiza campos
                     c.tipo = card["fields"]["issuetype"]["name"]
                     c.desricao = card["fields"]["summary"]
                     c.prioridade = card["fields"]["priority"]["name"]
@@ -123,8 +144,10 @@ def inserir_db_cards(cards: "dict"):
                     c.categoria_alterada = datetime.strptime(
                         card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
                     )
-
+                    # Busca status
+                    carrega_status(c.chave)
             else:
+                # Inser novo card
                 Card(
                     id=card["id"],
                     tipo=card["fields"]["issuetype"]["name"],
@@ -150,6 +173,8 @@ def inserir_db_cards(cards: "dict"):
                         card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
                     ),
                 )
+                # Busca status
+                carrega_status(card["key"])
 
 
 def inserir_db_apropriacoes(apropriacoes: "dict"):
@@ -165,5 +190,20 @@ def inserir_db_apropriacoes(apropriacoes: "dict"):
             )
 
 
+def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora: "str"):
+    with db_session:
+        s = Status.get(id=id)
+        if s == None:
+            Status(
+                id=id,
+                chave=chave,
+                de=de,
+                para=para,
+                datahora=datetime.strptime(datahora[:19], FORMATO_DATA),
+            )
+
+
 if __name__ == "__main__":
-    inserir_db_apropriacoes(carrega_apropriacoes())
+    inserir_db_cards(carrega_cards())
+    # inserir_db_apropriacoes(carrega_apropriacoes())
+    # carrega_status("SFS-573")

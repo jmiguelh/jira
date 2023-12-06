@@ -21,4 +21,12 @@ CREATE TABLE "jira_card" (
   "categoria" VARCHAR(50) NOT NULL,
   "categoria_alterada" DATETIME,
   "status_agrupado" VARCHAR(100) NOT NULL
+);
+
+CREATE TABLE "jira_status" (
+  "id" INTEGER NOT NULL PRIMARY KEY,
+  "chave" VARCHAR(10) NOT NULL,
+  "de" VARCHAR(50) NOT NULL,
+  "para" VARCHAR(50) NOT NULL,
+  "datahora" DATETIME NOT NULL
 )
