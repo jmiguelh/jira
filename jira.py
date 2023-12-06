@@ -1,9 +1,10 @@
 import os
 from dotenv import load_dotenv
 from atlassian import Jira
-from models.db import *
 from datetime import datetime
 import time
+from models.db import *
+import log.log as log
 
 FORMATO_DATA = "%Y-%m-%dT%H:%M:%S"
 
@@ -46,6 +47,7 @@ def carrega_cards() -> dict:
         inicio = issues["startAt"] + passo
         total = issues["total"]
         cards.extend(issues["issues"])
+    log.logar("CARD", f"Total de cards: {total}")
     return cards
 
 
@@ -122,6 +124,7 @@ def inserir_db_cards(cards: "dict"):
                     card["fields"]["updated"][:19], FORMATO_DATA
                 ):
                     # Atualiza campos
+                    log.logar("CARD", f"Card alterado: {c.card}")
                     c.tipo = card["fields"]["issuetype"]["name"]
                     c.desricao = card["fields"]["summary"]
                     c.prioridade = card["fields"]["priority"]["name"]
@@ -148,6 +151,7 @@ def inserir_db_cards(cards: "dict"):
                     carrega_status(c.chave)
             else:
                 # Inser novo card
+                log.logar("CARD", f"Card inserido: {card['key']}")
                 Card(
                     id=card["id"],
                     tipo=card["fields"]["issuetype"]["name"],
@@ -180,6 +184,7 @@ def inserir_db_cards(cards: "dict"):
 def inserir_db_apropriacoes(apropriacoes: "dict"):
     with db_session:
         for apropriacao in apropriacoes:
+            log.logar("APROPRIAÇÃO", f"Apropriação inserida: {apropriacao['issueId']}")
             Apropriacao(
                 id=apropriacao["id"],
                 card_id=apropriacao["issueId"],
@@ -194,6 +199,7 @@ def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora:
     with db_session:
         s = Status.get(id=id)
         if s == None:
+            log.logar("STATUS", f"Status alterado: {chave}")
             Status(
                 id=id,
                 chave=chave,
@@ -204,6 +210,9 @@ def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora:
 
 
 if __name__ == "__main__":
+    log.logar("MAIN", "Início do processo")
+    log.logar("MAIN", "Início Cards")
     inserir_db_cards(carrega_cards())
-    # inserir_db_apropriacoes(carrega_apropriacoes())
-    # carrega_status("SFS-573")
+    log.logar("MAIN", "Início Apropriação")
+    inserir_db_apropriacoes(carrega_apropriacoes())
+    log.logar("MAIN", "Fim do Processo")
