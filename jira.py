@@ -124,7 +124,7 @@ def inserir_db_cards(cards: "dict"):
                     card["fields"]["updated"][:19], FORMATO_DATA
                 ):
                     # Atualiza campos
-                    log.logar("CARD", f"Card alterado: {c.card}")
+                    log.logar("CARD", f"Card alterado: {c.chave}")
                     c.tipo = card["fields"]["issuetype"]["name"]
                     c.desricao = card["fields"]["summary"]
                     c.prioridade = card["fields"]["priority"]["name"]
