@@ -7,26 +7,30 @@ CREATE TABLE "jira_apropriacao" (
   "alterado" DATETIME NOT NULL
 );
 
-CREATE TABLE "jira_card" (
-  "id" INTEGER NOT NULL PRIMARY KEY,
-  "chave" VARCHAR(10) NOT NULL,
-  "tipo" VARCHAR(50) NOT NULL,
-  "desricao" TEXT NOT NULL,
-  "prioridade" VARCHAR(20) NOT NULL,
-  "status" VARCHAR(50) NOT NULL,
-  "criado" DATETIME,
-  "alterado" DATETIME,
-  "pai" VARCHAR(20) NOT NULL,
-  "tempo_total" REAL,
-  "categoria" VARCHAR(50) NOT NULL,
-  "categoria_alterada" DATETIME,
-  "status_agrupado" VARCHAR(100) NOT NULL
-);
-
 CREATE TABLE "jira_status" (
   "id" INTEGER NOT NULL PRIMARY KEY,
   "chave" VARCHAR(10) NOT NULL,
   "de" VARCHAR(50) NOT NULL,
   "para" VARCHAR(50) NOT NULL,
   "datahora" DATETIME NOT NULL
-)
+); 
+
+CREATE TABLE jira_card (
+    id                 INTEGER       NOT NULL
+                                     PRIMARY KEY
+                                     REFERENCES jira_apropriacao (card_id),
+    chave              VARCHAR (10)  NOT NULL
+                                     UNIQUE
+                                     REFERENCES jira_status (chave),
+    tipo               VARCHAR (50)  NOT NULL,
+    desricao           TEXT          NOT NULL,
+    prioridade         VARCHAR (20)  NOT NULL,
+    status             VARCHAR (50)  NOT NULL,
+    criado             DATETIME,
+    alterado           DATETIME,
+    pai                VARCHAR (20)  NOT NULL,
+    tempo_total        REAL,
+    categoria          VARCHAR (50)  NOT NULL,
+    categoria_alterada DATETIME,
+    status_agrupado    VARCHAR (100) NOT NULL
+);
