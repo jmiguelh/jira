@@ -6,7 +6,7 @@ import time
 from models.db import *
 import log.log as log
 
-FORMATO_DATA = "%Y-%m-%dT%H:%M:%S"
+FORMATO_DATA = "%Y-%m-%dT%H:%M:%S.%f%z"
 
 load_dotenv()
 
@@ -116,12 +116,12 @@ def listar_cards(cards: "dict"):
 
 
 def inserir_db_cards(cards: "dict"):
-    with db_session:
+    with db_session(optimistic=False):
         for card in cards:
             c = Card.get(id=card["id"])
             if not c == None:
                 if not c.alterado == datetime.strptime(
-                    card["fields"]["updated"][:19], FORMATO_DATA
+                    card["fields"]["updated"][:23], "%Y-%m-%dT%H:%M:%S.%f"
                 ):
                     # Atualiza campos
                     log.logar("CARD", f"Card alterado: {c.chave}")
@@ -132,7 +132,7 @@ def inserir_db_cards(cards: "dict"):
                     c.status = card["fields"]["status"]["name"]
                     c.status_agrupado = agrupar_status(card["fields"]["status"]["name"])
                     c.alterado = datetime.strptime(
-                        card["fields"]["updated"][:19], FORMATO_DATA
+                        card["fields"]["updated"], FORMATO_DATA
                     )
                     c.pai = (
                         card["fields"]["parent"]["fields"]["summary"]
@@ -146,7 +146,7 @@ def inserir_db_cards(cards: "dict"):
                         else "Concluído"
                     )
                     c.categoria_alterada = datetime.strptime(
-                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                        card["fields"]["statuscategorychangedate"], FORMATO_DATA
                     )
                     # Busca status
                     carrega_status(c.chave)
@@ -162,12 +162,8 @@ def inserir_db_cards(cards: "dict"):
                     prioridade=card["fields"]["priority"]["name"],
                     status=card["fields"]["status"]["name"],
                     status_agrupado=agrupar_status(card["fields"]["status"]["name"]),
-                    criado=datetime.strptime(
-                        card["fields"]["created"][:19], FORMATO_DATA
-                    ),
-                    alterado=datetime.strptime(
-                        card["fields"]["updated"][:19], FORMATO_DATA
-                    ),
+                    criado=datetime.strptime(card["fields"]["created"], FORMATO_DATA),
+                    alterado=datetime.strptime(card["fields"]["updated"], FORMATO_DATA),
                     pai=card["fields"]["parent"]["fields"]["summary"]
                     if "parent" in card["fields"]
                     else "",
@@ -176,7 +172,7 @@ def inserir_db_cards(cards: "dict"):
                     if not card["fields"]["status"]["name"] == "Concluído"
                     else "Concluído",
                     categoria_alterada=datetime.strptime(
-                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                        card["fields"]["statuscategorychangedate"], FORMATO_DATA
                     ),
                 )
                 # Busca status
@@ -184,17 +180,29 @@ def inserir_db_cards(cards: "dict"):
 
 
 def inserir_db_apropriacoes(apropriacoes: "dict"):
-    with db_session:
+    with db_session(optimistic=False):
         for apropriacao in apropriacoes:
-            log.logar("APROPRIAÇÃO", f"Apropriação inserida: {apropriacao['issueId']}")
-            Apropriacao(
-                id=apropriacao["id"],
-                card_id=apropriacao["issueId"],
-                inicio=datetime.strptime(apropriacao["started"][:19], FORMATO_DATA),
-                tempo=apropriacao["timeSpentSeconds"],
-                nome=apropriacao["author"]["displayName"],
-                alterado=datetime.strptime(apropriacao["updated"][:19], FORMATO_DATA),
-            )
+            a = Apropriacao.get(id=apropriacao["id"])
+            if not a == None:
+                log.logar(
+                    "APROPRIAÇÃO", f"Apropriação alterada: {apropriacao['issueId']}"
+                )
+                a.inicio = datetime.strptime(apropriacao["started"], FORMATO_DATA)
+                a.tempo = apropriacao["timeSpentSeconds"]
+                a.nome = apropriacao["author"]["displayName"]
+                a.alterado = datetime.strptime(apropriacao["updated"], FORMATO_DATA)
+            else:
+                log.logar(
+                    "APROPRIAÇÃO", f"Apropriação inserida: {apropriacao['issueId']}"
+                )
+                Apropriacao(
+                    id=apropriacao["id"],
+                    card_id=apropriacao["issueId"],
+                    inicio=datetime.strptime(apropriacao["started"], FORMATO_DATA),
+                    tempo=apropriacao["timeSpentSeconds"],
+                    nome=apropriacao["author"]["displayName"],
+                    alterado=datetime.strptime(apropriacao["updated"], FORMATO_DATA),
+                )
 
 
 def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora: "str"):
@@ -207,7 +215,7 @@ def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora:
                 chave=chave,
                 de=de,
                 para=para,
-                datahora=datetime.strptime(datahora[:19], FORMATO_DATA),
+                datahora=datetime.strptime(datahora, FORMATO_DATA),
             )
 
 
