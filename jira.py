@@ -6,7 +6,7 @@ import time
 from models.db import *
 import log.log as log
 
-FORMATO_DATA = "%Y-%m-%dT%H:%M:%S"
+FORMATO_DATA = "%Y-%m-%dT%H:%M:%S.%f%z"
 
 load_dotenv()
 
@@ -116,22 +116,23 @@ def listar_cards(cards: "dict"):
 
 
 def inserir_db_cards(cards: "dict"):
-    with db_session:
+    with db_session(optimistic=False):
         for card in cards:
             c = Card.get(id=card["id"])
             if not c == None:
                 if not c.alterado == datetime.strptime(
-                    card["fields"]["updated"][:19], FORMATO_DATA
+                    card["fields"]["updated"][:23], "%Y-%m-%dT%H:%M:%S.%f"
                 ):
                     # Atualiza campos
                     log.logar("CARD", f"Card alterado: {c.chave}")
                     c.tipo = card["fields"]["issuetype"]["name"]
+                    c.tipo_agrupado = agrupar_tipo(card["fields"]["issuetype"]["name"])
                     c.desricao = card["fields"]["summary"]
                     c.prioridade = card["fields"]["priority"]["name"]
                     c.status = card["fields"]["status"]["name"]
-                    c.status_agrupado = card["fields"]["status"]["description"]
+                    c.status_agrupado = agrupar_status(card["fields"]["status"]["name"])
                     c.alterado = datetime.strptime(
-                        card["fields"]["updated"][:19], FORMATO_DATA
+                        card["fields"]["updated"], FORMATO_DATA
                     )
                     c.pai = (
                         card["fields"]["parent"]["fields"]["summary"]
@@ -145,7 +146,7 @@ def inserir_db_cards(cards: "dict"):
                         else "Concluído"
                     )
                     c.categoria_alterada = datetime.strptime(
-                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                        card["fields"]["statuscategorychangedate"], FORMATO_DATA
                     )
                     # Busca status
                     carrega_status(c.chave)
@@ -155,17 +156,14 @@ def inserir_db_cards(cards: "dict"):
                 Card(
                     id=card["id"],
                     tipo=card["fields"]["issuetype"]["name"],
+                    tipo_agrupado=agrupar_tipo(card["fields"]["issuetype"]["name"]),
                     chave=card["key"],
                     desricao=card["fields"]["summary"],
                     prioridade=card["fields"]["priority"]["name"],
                     status=card["fields"]["status"]["name"],
-                    status_agrupado=card["fields"]["status"]["description"],
-                    criado=datetime.strptime(
-                        card["fields"]["created"][:19], FORMATO_DATA
-                    ),
-                    alterado=datetime.strptime(
-                        card["fields"]["updated"][:19], FORMATO_DATA
-                    ),
+                    status_agrupado=agrupar_status(card["fields"]["status"]["name"]),
+                    criado=datetime.strptime(card["fields"]["created"], FORMATO_DATA),
+                    alterado=datetime.strptime(card["fields"]["updated"], FORMATO_DATA),
                     pai=card["fields"]["parent"]["fields"]["summary"]
                     if "parent" in card["fields"]
                     else "",
@@ -174,7 +172,7 @@ def inserir_db_cards(cards: "dict"):
                     if not card["fields"]["status"]["name"] == "Concluído"
                     else "Concluído",
                     categoria_alterada=datetime.strptime(
-                        card["fields"]["statuscategorychangedate"][:19], FORMATO_DATA
+                        card["fields"]["statuscategorychangedate"], FORMATO_DATA
                     ),
                 )
                 # Busca status
@@ -182,17 +180,29 @@ def inserir_db_cards(cards: "dict"):
 
 
 def inserir_db_apropriacoes(apropriacoes: "dict"):
-    with db_session:
+    with db_session(optimistic=False):
         for apropriacao in apropriacoes:
-            log.logar("APROPRIAÇÃO", f"Apropriação inserida: {apropriacao['issueId']}")
-            Apropriacao(
-                id=apropriacao["id"],
-                card_id=apropriacao["issueId"],
-                inicio=datetime.strptime(apropriacao["started"][:19], FORMATO_DATA),
-                tempo=apropriacao["timeSpentSeconds"],
-                nome=apropriacao["author"]["displayName"],
-                alterado=datetime.strptime(apropriacao["updated"][:19], FORMATO_DATA),
-            )
+            a = Apropriacao.get(id=apropriacao["id"])
+            if not a == None:
+                log.logar(
+                    "APROPRIAÇÃO", f"Apropriação alterada: {apropriacao['issueId']}"
+                )
+                a.inicio = datetime.strptime(apropriacao["started"], FORMATO_DATA)
+                a.tempo = apropriacao["timeSpentSeconds"]
+                a.nome = apropriacao["author"]["displayName"]
+                a.alterado = datetime.strptime(apropriacao["updated"], FORMATO_DATA)
+            else:
+                log.logar(
+                    "APROPRIAÇÃO", f"Apropriação inserida: {apropriacao['issueId']}"
+                )
+                Apropriacao(
+                    id=apropriacao["id"],
+                    card_id=apropriacao["issueId"],
+                    inicio=datetime.strptime(apropriacao["started"], FORMATO_DATA),
+                    tempo=apropriacao["timeSpentSeconds"],
+                    nome=apropriacao["author"]["displayName"],
+                    alterado=datetime.strptime(apropriacao["updated"], FORMATO_DATA),
+                )
 
 
 def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora: "str"):
@@ -205,8 +215,70 @@ def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora:
                 chave=chave,
                 de=de,
                 para=para,
-                datahora=datetime.strptime(datahora[:19], FORMATO_DATA),
+                datahora=datetime.strptime(datahora, FORMATO_DATA),
             )
+
+
+def agrupar_status(status: "str") -> str:
+    match status:
+        case "Aguardando Aprovação":
+            retorno = "Backlog"
+        case "Aguardando Chamado":
+            retorno = "Systextil"
+        case "Aguardando Desenvolvimento":
+            retorno = "Systextil"
+        case "Aprovado":
+            retorno = "Especificação"
+        case "Aguardando Orçamento":
+            retorno = "Systextil"
+        case "Em andamento":
+            retorno = "Desenvolvimento"
+        case "Especificação":
+            retorno = "Especificação"
+        case "Tarefas pendentes":
+            retorno = "Desenvolvimento"
+        case "Validação BA":
+            retorno = "Desenvolvimento"
+        case "Aguardando QA":
+            retorno = "Desenvolvimento"
+        case "Aguardando homologação":
+            retorno = "Homologação"
+        case "Homologando Systextil":
+            retorno = "Systextil"
+        case "Validação em QA":
+            retorno = "Homologação"
+        case "Aguardando PRD":
+            retorno = "Produção"
+        case "Concluído":
+            retorno = "Concluído"
+        case "Concluído Systextil":
+            retorno = "Concluído"
+        case "Validação em PRD":
+            retorno = "Produção"
+        case "Aprovação da Especificação":
+            retorno = "Especificação"
+        case "Homologando":
+            retorno = "Homologação"
+        case "Reprovar Homologação":
+            retorno = "Homologação"
+    return retorno
+
+
+def agrupar_tipo(tipo: "str") -> str:
+    match tipo:
+        case "Ajuste":
+            retorno = "Corretivo"
+        case "Configuração":
+            retorno = "Evolutivo"
+        case "Estudo":
+            retorno = "Evolutivo"
+        case "Inconsistência":
+            retorno = "Corretivo"
+        case "Melhoria":
+            retorno = "Evolutivo"
+        case "Nova função":
+            retorno = "Evolutivo"
+    return retorno
 
 
 if __name__ == "__main__":
