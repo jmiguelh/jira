@@ -126,10 +126,11 @@ def inserir_db_cards(cards: "dict"):
                     # Atualiza campos
                     log.logar("CARD", f"Card alterado: {c.chave}")
                     c.tipo = card["fields"]["issuetype"]["name"]
+                    c.tipo_agrupado = agrupar_tipo(card["fields"]["issuetype"]["name"])
                     c.desricao = card["fields"]["summary"]
                     c.prioridade = card["fields"]["priority"]["name"]
                     c.status = card["fields"]["status"]["name"]
-                    c.status_agrupado = card["fields"]["status"]["description"]
+                    c.status_agrupado = agrupar_status(card["fields"]["status"]["name"])
                     c.alterado = datetime.strptime(
                         card["fields"]["updated"][:19], FORMATO_DATA
                     )
@@ -155,11 +156,12 @@ def inserir_db_cards(cards: "dict"):
                 Card(
                     id=card["id"],
                     tipo=card["fields"]["issuetype"]["name"],
+                    tipo_agrupado=agrupar_tipo(card["fields"]["issuetype"]["name"]),
                     chave=card["key"],
                     desricao=card["fields"]["summary"],
                     prioridade=card["fields"]["priority"]["name"],
                     status=card["fields"]["status"]["name"],
-                    status_agrupado=card["fields"]["status"]["description"],
+                    status_agrupado=agrupar_status(card["fields"]["status"]["name"]),
                     criado=datetime.strptime(
                         card["fields"]["created"][:19], FORMATO_DATA
                     ),
@@ -207,6 +209,68 @@ def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora:
                 para=para,
                 datahora=datetime.strptime(datahora[:19], FORMATO_DATA),
             )
+
+
+def agrupar_status(status: "str") -> str:
+    match status:
+        case "Aguardando Aprovação":
+            retorno = "Backlog"
+        case "Aguardando Chamado":
+            retorno = "Systextil"
+        case "Aguardando Desenvolvimento":
+            retorno = "Systextil"
+        case "Aprovado":
+            retorno = "Especificação"
+        case "Aguardando Orçamento":
+            retorno = "Systextil"
+        case "Em andamento":
+            retorno = "Desenvolvimento"
+        case "Especificação":
+            retorno = "Especificação"
+        case "Tarefas pendentes":
+            retorno = "Desenvolvimento"
+        case "Validação BA":
+            retorno = "Desenvolvimento"
+        case "Aguardando QA":
+            retorno = "Desenvolvimento"
+        case "Aguardando homologação":
+            retorno = "Homologação"
+        case "Homologando Systextil":
+            retorno = "Systextil"
+        case "Validação em QA":
+            retorno = "Homologação"
+        case "Aguardando PRD":
+            retorno = "Produção"
+        case "Concluído":
+            retorno = "Concluído"
+        case "Concluído Systextil":
+            retorno = "Concluído"
+        case "Validação em PRD":
+            retorno = "Produção"
+        case "Aprovação da Especificação":
+            retorno = "Especificação"
+        case "Homologando":
+            retorno = "Homologação"
+        case "Reprovar Homologação":
+            retorno = "Homologação"
+    return retorno
+
+
+def agrupar_tipo(tipo: "str") -> str:
+    match tipo:
+        case "Ajuste":
+            retorno = "Corretivo"
+        case "Configuração":
+            retorno = "Evolutivo"
+        case "Estudo":
+            retorno = "Evolutivo"
+        case "Inconsistência":
+            retorno = "Corretivo"
+        case "Melhoria":
+            retorno = "Evolutivo"
+        case "Nova função":
+            retorno = "Evolutivo"
+    return retorno
 
 
 if __name__ == "__main__":
