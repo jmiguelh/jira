@@ -20,6 +20,7 @@ class Card(db.Entity):
     categoria = Optional(str, 50)
     categoria_alterada = Optional(datetime)
     status_agrupado = Optional(str, 100)
+    tipo_agrupado = Optional(str, 50)
 
 
 class Apropriacao(db.Entity):

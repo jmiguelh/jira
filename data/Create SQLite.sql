@@ -17,11 +17,9 @@ CREATE TABLE "jira_status" (
 
 CREATE TABLE jira_card (
     id                 INTEGER       NOT NULL
-                                     PRIMARY KEY
-                                     REFERENCES jira_apropriacao (card_id),
+                                     PRIMARY KEY,
     chave              VARCHAR (10)  NOT NULL
-                                     UNIQUE
-                                     REFERENCES jira_status (chave),
+                                     UNIQUE,
     tipo               VARCHAR (50)  NOT NULL,
     desricao           TEXT          NOT NULL,
     prioridade         VARCHAR (20)  NOT NULL,
@@ -32,5 +30,6 @@ CREATE TABLE jira_card (
     tempo_total        REAL,
     categoria          VARCHAR (50)  NOT NULL,
     categoria_alterada DATETIME,
-    status_agrupado    VARCHAR (100) NOT NULL
+    status_agrupado    VARCHAR (100) NOT NULL,
+    tipo_agrupado      VARCHAR (50) 
 );
