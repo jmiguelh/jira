@@ -19,7 +19,9 @@ def carrega_cards() -> dict:
         cloud=True,
     )
 
-    jql_request = "PROJECT IN (SFS) and type not in (subTaskIssueTypes(),Epic) AND status != Cancelled AND key != SFS-272 and status != Reprovado"
+    jql_request = (
+        "PROJECT IN (SFS) and type not in (subTaskIssueTypes(),Epic) AND key != SFS-272"
+    )
 
     cards = []
     campos = [
@@ -261,6 +263,10 @@ def agrupar_status(status: "str") -> str:
             retorno = "Homologação"
         case "Reprovar Homologação":
             retorno = "Homologação"
+        case "Cancelado":
+            retorno = "Cancelado"
+        case "Reprovado":
+            retorno = "Cancelado"
     return retorno
 
 
