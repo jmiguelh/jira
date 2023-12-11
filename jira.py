@@ -287,4 +287,6 @@ if __name__ == "__main__":
     inserir_db_cards(carrega_cards())
     log.logar("MAIN", "Início Apropriação")
     inserir_db_apropriacoes(carrega_apropriacoes())
+    log.logar("MAIN", "Início Diário")
+    diario()
     log.logar("MAIN", "Fim do Processo")

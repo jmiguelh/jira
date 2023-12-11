@@ -42,6 +42,23 @@ class Status(db.Entity):
     datahora = Required(datetime)
 
 
+@db_session
+def diario():
+    sql = """
+        DELETE FROM jira_diario
+        WHERE  data = DATE('now');
+        """
+    cursor = db.execute(sql)
+    commit()
+    sql = """
+        INSERT INTO jira_diario
+        SELECT DATE('now') as data, status_agrupado, pai, tipo_agrupado, count(*) as quatidade
+        FROM jira_card
+        GROUP BY status_agrupado, pai, tipo_agrupado
+        """
+    cursor = db.execute(sql)
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
