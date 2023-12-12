@@ -287,7 +287,13 @@ def agrupar_tipo(tipo: "str") -> str:
     return retorno
 
 
-if __name__ == "__main__":
+def atualizar():
+    with db_session(optimistic=False):
+        c = Controle.get(id=1)
+        c.atualizacao = datetime.now()
+
+
+def carregar():
     log.logar("MAIN", "Início do processo")
     log.logar("MAIN", "Início Cards")
     inserir_db_cards(carrega_cards())
@@ -295,4 +301,9 @@ if __name__ == "__main__":
     inserir_db_apropriacoes(carrega_apropriacoes())
     log.logar("MAIN", "Início Diário")
     diario()
+    atualizar()
     log.logar("MAIN", "Fim do Processo")
+
+
+if __name__ == "__main__":
+    carregar()
