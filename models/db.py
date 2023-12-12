@@ -42,6 +42,17 @@ class Status(db.Entity):
     datahora = Required(datetime)
 
 
+class Controle(db.Entity):
+    _table_ = "jira_controle"
+    atualizacao = Optional(datetime)
+
+
+@db_session
+def ultima_atualzacao() -> datetime:
+    c = Controle.get(id=1)
+    return c.atualizacao.strftime("%d/%m/%Y %H:%M:%S")
+
+
 @db_session
 def diario():
     sql = """
@@ -57,6 +68,11 @@ def diario():
         GROUP BY status_agrupado, pai, tipo_agrupado
         """
     cursor = db.execute(sql)
+
+
+# result = db.select("select * from jira_card where status_agrupado <> 'Cancelado'")
+# colunas = ['id', 'chave', 'tipo', 'desricao', 'prioridade', 'status', 'criado', 'alterado', 'pai', 'tempo_total', 'categoria', 'categoria_alterada', 'status_agrupado', 'tipo_agrupado']
+# a = pd.DataFrame(resultcolumns=colunas)
 
 
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)

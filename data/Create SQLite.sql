@@ -41,3 +41,11 @@ CREATE TABLE jira_diario (
     tipo_agrupado  VARCHAR (50)  NOT NULL,
     quantidade     INTEGER
 );
+
+CREATE TABLE "jira_controle" (
+  "id" INTEGER PRIMARY KEY AUTOINCREMENT,
+  "atualizacao" DATETIME
+);
+
+INSERT INTO jira_controle (atualizacao)
+VALUES (datetime('now'));
