@@ -11,6 +11,7 @@ requests = "^2.31.0"
 python-dotenv = "^1.0.0"
 pony = "^0.7.17"
 streamlit = "^1.29.0"
+plotly = "^5.18.0"
 
 
 [tool.poetry.group.dev.dependencies]
