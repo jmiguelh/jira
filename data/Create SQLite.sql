@@ -36,7 +36,7 @@ CREATE TABLE jira_card (
 
 CREATE TABLE jira_diario (
     data           DATE,
-    status_agupado VARCHAR (100) NOT NULL,
+    status_agrupado VARCHAR (100) NOT NULL,
     pai            VARCHAR (20)  NOT NULL,
     tipo_agrupado  VARCHAR (50)  NOT NULL,
     quantidade     INTEGER
