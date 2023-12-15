@@ -28,6 +28,38 @@ def cards_aberto_no_mes() -> int:
 
 
 @db_session
+def total_cards_concluidos() -> int:
+    sql = """SELECT sum(quantidade)
+            FROM jira_diario
+            WHERE status_agrupado = 'Concluído'
+            AND data = date('now');"""
+    result = db.select(sql)
+    return result[0]
+
+
+@db_session
+def cards_conluidos_ultimo_dia() -> int:
+    sql = """SELECT sum(quantidade)
+            FROM jira_diario
+            WHERE status_agrupado = 'Concluído'
+            AND data = date('now','-1 day')"""
+    result = db.select(sql)
+    return total_cards_concluidos() - result[0]
+
+
+@db_session
+def cards_concludos_no_mes() -> int:
+    sql = """SELECT sum(quantidade)
+            FROM jira_diario
+            WHERE status_agrupado = 'Concluído'
+            AND data = (SELECT min(data)
+                        FROM jira_diario
+                        WHERE data > date('now','start of month'));"""
+    result = db.select(sql)
+    return total_cards_concluidos() - result[0]
+
+
+@db_session
 def cards_por_mes():
     sql = """SELECT strftime('%Y-%m',criado), 
             sum(CASE
@@ -63,7 +95,6 @@ def cards_por_setor():
         result,
         columns=["Setor", "Quantidade"],
     )
-    # df = df.set_index("Setor")
     return df
 
 
