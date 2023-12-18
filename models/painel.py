@@ -32,7 +32,9 @@ def total_cards_concluidos() -> int:
     sql = """SELECT sum(quantidade)
             FROM jira_diario
             WHERE status_agrupado = 'Concluído'
-            AND data = date('now');"""
+            AND data = (SELECT max(data)
+                        FROM jira_diario
+                        WHERE data <= date('now','-1 day'))"""
     result = db.select(sql)
     return result[0]
 
@@ -42,7 +44,9 @@ def cards_conluidos_ultimo_dia() -> int:
     sql = """SELECT sum(quantidade)
             FROM jira_diario
             WHERE status_agrupado = 'Concluído'
-            AND data = date('now','-1 day')"""
+            AND data = (SELECT max(data)
+                        FROM jira_diario);"""
+
     result = db.select(sql)
     return total_cards_concluidos() - result[0]
 
