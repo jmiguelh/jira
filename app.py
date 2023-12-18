@@ -100,6 +100,21 @@ c.plotly_chart(fig)
 # c.bar_chart(painel.cards_por_setor())
 
 rodape = st.container()
-a, b = rodape.columns(2)
+a, b, c = rodape.columns(3)
 
-a.bar_chart(painel.cards_por_setor_status())
+# a.write("Cards abertos por setor")
+# a.bar_chart(painel.cards_por_setor_status())
+
+b.write("Cards concluído por mês")
+b.bar_chart(painel.cards_concluido_por_mes())
+
+fig = px.pie(
+    painel.cards_concluido_por_setor(),
+    values="Quantidade",
+    names="Setor",
+    width=450,
+    height=450,
+)
+
+c.write("Cards concluído por setor")
+c.plotly_chart(fig)

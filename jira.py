@@ -85,12 +85,16 @@ def carrega_status(chave: "str"):
     status = jira.get_issue_changelog(chave, limit=5000)
 
     for s in status["histories"]:
-        if s["items"][0]["field"] == "status":
+        if s["items"][0]["field"] == "status" or s["items"][0]["field"] == "resolution":
             inserir_db_status(
                 s["id"],
                 chave,
-                s["items"][0]["fromString"],
-                s["items"][0]["toString"],
+                s["items"][0]["fromString"]
+                if s["items"][0]["fromString"] != None
+                else s["items"][1]["fromString"],
+                s["items"][0]["toString"]
+                if s["items"][0]["toString"] != None
+                else s["items"][1]["toString"],
                 s["created"],
             )
 
@@ -152,6 +156,12 @@ def inserir_db_cards(cards: "dict"):
                     )
                     # Busca status
                     carrega_status(c.chave)
+                # else:
+                #     c.categoria_alterada = datetime.strptime(
+                #         card["fields"]["statuscategorychangedate"], FORMATO_DATA
+                #     )
+                #     if card["fields"]["status"]["name"] == "Concluído":
+                #         carrega_status(c.chave)
             else:
                 # Inser novo card
                 log.logar("CARD", f"Card inserido: {card['key']}")
@@ -307,3 +317,4 @@ def carregar():
 
 if __name__ == "__main__":
     carregar()
+    # carrega_status("SFS-483")

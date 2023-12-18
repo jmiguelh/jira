@@ -49,3 +49,15 @@ CREATE TABLE "jira_controle" (
 
 INSERT INTO jira_controle (atualizacao)
 VALUES (datetime('now'));
+
+CREATE VIEW jira_vw_data_conclusao AS
+    SELECT c.chave,
+           max(s.datahora) AS data_conclusao,
+           c.tipo_agrupado,
+           c.pai
+      FROM jira_card AS c
+           INNER JOIN
+           jira_status AS s ON c.chave = s.chave
+     WHERE status_agrupado = 'Concluído' AND 
+           s.para IN ('Done', 'Concluído Systextil') 
+     GROUP BY c.chave;
