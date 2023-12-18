@@ -109,12 +109,12 @@ b.write("Cards concluído por mês")
 b.bar_chart(painel.cards_concluido_por_mes())
 
 fig = px.pie(
-    painel.cards_concluido_por_setor(),
+    painel.cards_concluido_por_mes_setor(),
     values="Quantidade",
     names="Setor",
     width=450,
     height=450,
 )
 
-c.write("Cards concluído por setor")
+c.write("Cards concluído no mês por setor")
 c.plotly_chart(fig)

@@ -118,10 +118,10 @@ def cards_por_setor():
 
 
 @db_session
-def cards_concluido_por_setor():
+def cards_concluido_por_mes_setor():
     sql = """SELECT pai, count(1)
-            FROM jira_card
-            WHERE status_agrupado = 'Concluído'
+            FROM jira_vw_data_conclusao
+            WHERE data_conclusao > date('now','start of month')
             GROUP BY pai"""
     result = db.select(sql)
     df = pd.DataFrame(
