@@ -3,5 +3,5 @@ headless = true
 port = 9000
 
 [theme]
-base="dark"
+base="light"
 primaryColor="#00A2E1"

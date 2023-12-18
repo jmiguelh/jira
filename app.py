@@ -25,7 +25,7 @@ st.set_page_config(
 )
 
 with st.sidebar:
-    st.image("img/lunelli.png", width=250)
+    st.image("img/lunelli_colorida.png", width=250)
     with st.expander(":pushpin: Filtos"):
         setor = st.selectbox("Setor:", SETOR)
         tipo = st.selectbox("Tipo:", TIPO)
