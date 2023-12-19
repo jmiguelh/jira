@@ -75,7 +75,7 @@ def cards_por_mes():
         result,
         columns=["Mês", "Evolutivo", "Corretivo"],
     )
-    df = df.set_index("Mês")
+    # df = df.set_index("Mês")
     return df
 
 
@@ -99,7 +99,7 @@ def cards_concluido_por_mes():
         result,
         columns=["Mês", "Evolutivo", "Corretivo"],
     )
-    df = df.set_index("Mês")
+    # df = df.set_index("Mês")
     return df
 
 

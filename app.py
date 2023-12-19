@@ -91,12 +91,28 @@ a2.metric(
 
 
 b.write("Cards aberto por mês")
-b.bar_chart(painel.cards_por_mes())
+fig = px.bar(
+    painel.cards_por_mes(),
+    x="Mês",
+    y=["Corretivo", "Evolutivo"],
+    text_auto=True,
+)
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
+b.plotly_chart(fig, use_container_width=True)
+
 
 fig = px.pie(
     painel.cards_por_setor(), values="Quantidade", names="Setor", width=450, height=450
 )
-
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
 c.write("Cards aberto por setor")
 c.plotly_chart(fig, use_container_width=True)
 
@@ -113,12 +129,30 @@ fig = px.bar(
     text_auto=True,
     orientation="h",
 )
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
 a.plotly_chart(fig, use_container_width=True)
 
 
 b.write("Cards concluído por mês")
-b.bar_chart(painel.cards_concluido_por_mes())
 
+fig = px.bar(
+    painel.cards_concluido_por_mes(),
+    x="Mês",
+    y=["Corretivo", "Evolutivo"],
+    text_auto=True,
+)
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
+b.plotly_chart(fig, use_container_width=True)
+
+c.write("Cards concluído no mês por setor")
 fig = px.pie(
     painel.cards_concluido_por_mes_setor(),
     values="Quantidade",
@@ -126,6 +160,9 @@ fig = px.pie(
     width=450,
     height=450,
 )
-
-c.write("Cards concluído no mês por setor")
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
 c.plotly_chart(fig, use_container_width=True)
