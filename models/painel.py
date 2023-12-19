@@ -154,6 +154,30 @@ def cards_por_setor_status():
     return df
 
 
+@db_session
+def apropriacao_por_tipo():
+    sql = """SELECT strftime('%Y-%m',inicio) as Mes, 
+                cast((cast(sum(CASE
+                    WHEN tipo_agrupado = "Evolutivo" THEN tempo
+                    ELSE 0
+                END) as float) / cast(sum(tempo) as float))* 100 as int) AS Evolutivo,
+                cast((cast(sum(CASE
+                    WHEN tipo_agrupado = "Corretivo" THEN tempo
+                    ELSE 0
+                END) as float) / cast(sum(tempo)as float))* 100 as int) AS Corretivo
+            FROM jira_card as c
+            INNER JOIN jira_apropriacao as a 
+            ON c.id = a.card_id
+            WHERE c.status_agrupado <> 'Cancelado'
+            GROUP BY strftime('%Y-%m',inicio)
+            ORDER BY 1 DESC
+            LIMIT 6"""
+    result = db.select(sql)
+    df = pd.DataFrame(result, columns=["Mês", "Evolutivo", "Corretivo"])
+    # df = df.set_index("Mes")
+    return df
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)

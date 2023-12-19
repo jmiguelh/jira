@@ -24,6 +24,7 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
+### Barra lateral ###
 with st.sidebar:
     st.image("img/lunelli_colorida.png", width=250)
     with st.expander(":pushpin: Filtos"):
@@ -43,9 +44,11 @@ with st.sidebar:
     st.write("")
     st.image("img/salesforce_logo.png", width=150)
 
+### Título ###
 topo = st.container()
 topo.title("Salesforce Squad")
 
+### Primeria Linha ###
 corpo = st.container()
 a, b, c = corpo.columns(3)
 
@@ -95,15 +98,23 @@ fig = px.pie(
 )
 
 c.write("Cards aberto por setor")
-c.plotly_chart(fig)
+c.plotly_chart(fig, use_container_width=True)
 
-# c.bar_chart(painel.cards_por_setor())
 
+### Segunda linha ###
 rodape = st.container()
 a, b, c = rodape.columns(3)
 
-# a.write("Cards abertos por setor")
-# a.bar_chart(painel.cards_por_setor_status())
+a.write("% Apropriação por tipo")
+fig = px.bar(
+    painel.apropriacao_por_tipo(),
+    x=["Corretivo", "Evolutivo"],
+    y="Mês",
+    text_auto=True,
+    orientation="h",
+)
+a.plotly_chart(fig, use_container_width=True)
+
 
 b.write("Cards concluído por mês")
 b.bar_chart(painel.cards_concluido_por_mes())
@@ -117,4 +128,4 @@ fig = px.pie(
 )
 
 c.write("Cards concluído no mês por setor")
-c.plotly_chart(fig)
+c.plotly_chart(fig, use_container_width=True)

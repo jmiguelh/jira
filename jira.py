@@ -317,4 +317,3 @@ def carregar():
 
 if __name__ == "__main__":
     carregar()
-    # carrega_status("SFS-483")
