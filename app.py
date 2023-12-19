@@ -27,10 +27,10 @@ st.set_page_config(
 ### Barra lateral ###
 with st.sidebar:
     st.image("img/lunelli_colorida.png", width=250)
-    with st.expander(":pushpin: Filtos"):
-        setor = st.selectbox("Setor:", SETOR)
-        tipo = st.selectbox("Tipo:", TIPO)
-        status = st.multiselect("Status:", STATUS, default=STATUS)
+    # with st.expander(":pushpin: Filtos"):
+    #     setor = st.selectbox("Setor:", SETOR)
+    #     tipo = st.selectbox("Tipo:", TIPO)
+    #     status = st.multiselect("Status:", STATUS, default=STATUS)
     with st.expander(
         f":arrows_counterclockwise:Última atualização: {jira.ultima_atualzacao()}"
     ):
@@ -166,3 +166,17 @@ fig.update_layout(
     )
 )
 c.plotly_chart(fig, use_container_width=True)
+
+### Terceira linha ###
+terceira = st.container()
+a, b = terceira.columns(2)
+
+fig = px.area(
+    painel.diario_por_status(), x="Data", y="Cards", color="Status", line_group="Status"
+)
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
+a.plotly_chart(fig, use_container_width=True)

@@ -178,6 +178,18 @@ def apropriacao_por_tipo():
     return df
 
 
+@db_session
+def diario_por_status():
+    sql = """SELECT data, status_agrupado, sum(quantidade)
+            FROM jira_diario
+            GROUP BY data, status_agrupado
+            HAVING status_agrupado not in('Concluído','Cancelado','Systextil')
+            AND data > date('now','-30 days');"""
+    result = db.select(sql)
+    df = pd.DataFrame(result, columns=["Data", "Status", "Cards"])
+    return df
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
