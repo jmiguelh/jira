@@ -179,6 +179,34 @@ def apropriacao_por_tipo():
 
 
 @db_session
+def apropriacao_por_pai():
+    sql = """SELECT strftime('%Y-%m',inicio) as Mes, 
+                    cast((cast(sum(CASE
+                        WHEN pai = "CRL" THEN tempo
+                        ELSE 0
+                    END) as float) / cast(sum(tempo) as float))* 100 as int) AS CRL,
+                    cast((cast(sum(CASE
+                        WHEN pai = "Têxtil" THEN tempo
+                        ELSE 0
+                    END) as float) / cast(sum(tempo)as float))* 100 as int) AS Têxtil,
+                    cast((cast(sum(CASE
+                        WHEN pai = "Comercial" THEN tempo
+                        ELSE 0
+                    END) as float) / cast(sum(tempo)as float))* 100 as int) AS Têxtil
+                FROM jira_card as c
+                INNER JOIN jira_apropriacao as a 
+                ON c.id = a.card_id
+                WHERE c.status_agrupado <> 'Cancelado'
+                GROUP BY strftime('%Y-%m',inicio)
+                ORDER BY 1 DESC
+                LIMIT 6"""
+    result = db.select(sql)
+    df = pd.DataFrame(result, columns=["Mês", "CRL", "Têxtil", "Comercial"])
+    # df = df.set_index("Mes")
+    return df
+
+
+@db_session
 def diario_por_status():
     sql = """SELECT data, status_agrupado, sum(quantidade)
             FROM jira_diario

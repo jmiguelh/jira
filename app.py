@@ -171,6 +171,7 @@ c.plotly_chart(fig, use_container_width=True)
 terceira = st.container()
 a, b = terceira.columns(2)
 
+a.write("Evolução dos cards")
 fig = px.area(
     painel.diario_por_status(), x="Data", y="Cards", color="Status", line_group="Status"
 )
@@ -180,3 +181,18 @@ fig.update_layout(
     )
 )
 a.plotly_chart(fig, use_container_width=True)
+
+b.write("% Apropriação por Setor")
+fig = px.bar(
+    painel.apropriacao_por_pai(),
+    x=["Comercial", "Têxtil", "CRL"],
+    y="Mês",
+    text_auto=True,
+    orientation="h",
+)
+fig.update_layout(
+    legend=dict(
+        orientation="h", entrywidth=70, yanchor="bottom", y=1.02, xanchor="right", x=1
+    )
+)
+b.plotly_chart(fig, use_container_width=True)
