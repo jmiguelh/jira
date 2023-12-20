@@ -56,24 +56,18 @@ def cards_concludos_no_mes() -> int:
 
 @db_session
 def cards_por_mes():
-    sql = """SELECT strftime('%Y-%m',criado), 
-            sum(CASE
-                WHEN tipo_agrupado = "Evolutivo" THEN 1
-                ELSE 0
-            END) AS Evolutivo,
-            sum(CASE
-                WHEN tipo_agrupado = "Corretivo" THEN 1
-                ELSE 0
-            END) AS Corretivo
+    sql = """SELECT strftime('%Y-%m',criado) as Mês, 
+                tipo_agrupado,
+                sum(1) AS Cards
             FROM jira_card
             WHERE status_agrupado <> 'Cancelado'
-            GROUP BY strftime('%Y-%m',criado)
-            ORDER BY 1 DESC
-            LIMIT 6"""
+                AND criado > date(date('now','start of month'),'-5 month')
+            GROUP BY strftime('%Y-%m',criado), tipo_agrupado
+            ORDER BY 1 DESC"""
     result = db.select(sql)
     df = pd.DataFrame(
         result,
-        columns=["Mês", "Evolutivo", "Corretivo"],
+        columns=["Mês", "Tipo", "Cards"],
     )
     # df = df.set_index("Mês")
     return df
@@ -82,22 +76,16 @@ def cards_por_mes():
 @db_session
 def cards_concluido_por_mes():
     sql = """SELECT strftime('%Y-%m',data_conclusao), 
-            sum(CASE
-                WHEN tipo_agrupado = "Evolutivo" THEN 1
-                ELSE 0
-            END) AS Evolutivo,
-            sum(CASE
-                WHEN tipo_agrupado = "Corretivo" THEN 1
-                ELSE 0
-            END) AS Corretivo
+                tipo_agrupado,
+                sum(1) AS Cards
             FROM jira_vw_data_conclusao
-            GROUP BY strftime('%Y-%m',data_conclusao)
-            ORDER BY 1 DESC
-            LIMIT 6"""
+            WHERE data_conclusao > date(date('now','start of month'),'-5 month')
+            GROUP BY strftime('%Y-%m',data_conclusao), tipo_agrupado
+            ORDER BY 1 DESC"""
     result = db.select(sql)
     df = pd.DataFrame(
         result,
-        columns=["Mês", "Evolutivo", "Corretivo"],
+        columns=["Mês", "Tipo", "Cards"],
     )
     # df = df.set_index("Mês")
     return df
