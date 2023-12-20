@@ -230,22 +230,30 @@ def main():
         layout="wide",
         initial_sidebar_state="expanded",
     )
-
-    ### Barra lateral ###
+    ### Remover o botão Deploy
+    st.markdown(
+        """
+            <style>
+                .reportview-container {
+                    margin-top: -2em;
+                }
+                #MainMenu {visibility: hidden;}
+                .stDeployButton {display:none;}
+                footer {visibility: hidden;}
+                #stDecoration {display:none;}
+            </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
     barra_lateral()
 
-    ### Título ###
-    topo = st.container()
-    topo.title("Salesforce Squad")
+    st.title("Salesforce Squad")
 
-    ### Primeria Linha ###
     primeira_linha()
 
-    ### Segunda linha ###
     segunda_linha()
 
-    ### Terceira linha ###
     terceira_linha()
 
 
