@@ -86,6 +86,7 @@ def primeira_linha():
         y="Cards",
         color="Tipo",
         text_auto=True,
+        color_discrete_sequence=px.colors.qualitative.Set1,
     )
     fig.update_layout(
         legend=dict(
@@ -99,7 +100,12 @@ def primeira_linha():
     )
     b.plotly_chart(fig, use_container_width=True)
 
-    fig = px.pie(painel.cards_por_setor(), values="Quantidade", names="Setor")
+    fig = px.pie(
+        painel.cards_por_setor(),
+        values="Quantidade",
+        names="Setor",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
+    )
     fig.update_layout(
         legend=dict(
             orientation="h",
@@ -125,6 +131,7 @@ def segunda_linha():
         y="Mês",
         text_auto=True,
         orientation="h",
+        color_discrete_sequence=px.colors.qualitative.Set1,
     )
     fig.update_layout(
         legend=dict(
@@ -146,6 +153,7 @@ def segunda_linha():
         y="Cards",
         color="Tipo",
         text_auto=True,
+        color_discrete_sequence=px.colors.qualitative.Set1,
     )
     fig.update_layout(
         legend=dict(
@@ -164,6 +172,7 @@ def segunda_linha():
         painel.cards_concluido_por_mes_setor(),
         values="Quantidade",
         names="Setor",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig.update_layout(
         legend=dict(
@@ -209,6 +218,7 @@ def terceira_linha():
         y="Mês",
         text_auto=True,
         orientation="h",
+        color_discrete_sequence=px.colors.qualitative.Pastel,
     )
     fig.update_layout(
         legend=dict(
