@@ -12,10 +12,12 @@ python-dotenv = "^1.0.0"
 pony = "^0.7.17"
 streamlit = "^1.29.0"
 plotly = "^5.18.0"
+atlassian-python-api = "^3.41.4"
 
 
 [tool.poetry.group.dev.dependencies]
 ipython = "^8.18.0"
+ipykernel = "^6.27.1"
 
 [build-system]
 requires = ["poetry-core"]
