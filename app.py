@@ -6,6 +6,12 @@ import jira
 import models.painel as painel
 
 
+color_discrete_map = {
+    'Têxtil': 'olive',
+    'Comercial': 'orange', 
+    'CRL': 'royalblue'
+    }
+
 def barra_lateral():
     TIPO = ["Todos", "Evolutivo", "Corretivo"]
     SETOR = ["Todos", "CRL", "Comercial", "Têxtil"]
@@ -104,7 +110,8 @@ def primeira_linha():
         painel.cards_por_setor(),
         values="Quantidade",
         names="Setor",
-        color_discrete_sequence=px.colors.qualitative.Pastel,
+        color="Setor",
+        color_discrete_map= color_discrete_map,
     )
     fig.update_layout(
         legend=dict(
@@ -172,7 +179,8 @@ def segunda_linha():
         painel.cards_concluido_por_mes_setor(),
         values="Quantidade",
         names="Setor",
-        color_discrete_sequence=px.colors.qualitative.Pastel,
+        color="Setor",
+        color_discrete_map= color_discrete_map
     )
     fig.update_layout(
         legend=dict(
@@ -218,7 +226,7 @@ def terceira_linha():
         y="Mês",
         text_auto=True,
         orientation="h",
-        color_discrete_sequence=px.colors.qualitative.Pastel,
+        color_discrete_map= color_discrete_map
     )
     fig.update_layout(
         legend=dict(
@@ -238,7 +246,7 @@ def main():
         page_title="Lunelli - Salesforce Squad",
         page_icon="🧊",
         layout="wide",
-        initial_sidebar_state="expanded",
+        initial_sidebar_state="auto",
     )
     ### Remover o botão Deploy
     st.markdown(
