@@ -7,6 +7,36 @@ db = Database()
 
 
 @db_session
+def carregar_cards() -> pd.DataFrame:
+    sql = """select id, chave, tipo, desricao, prioridade, status, criado, 
+                alterado, pai, tempo_total, categoria, categoria_alterada, 
+                status_agrupado, tipo_agrupado 
+            from jira_card where status_agrupado <> 'Cancelado'"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "id",
+            "chave",
+            "tipo",
+            "desricao",
+            "prioridade",
+            "status",
+            "criado",
+            "alterado",
+            "pai",
+            "tempo_total",
+            "categoria",
+            "categoria_alterada",
+            "status_agrupado",
+            "tipo_agrupado",
+        ],
+    )
+    df = df.set_index("id")
+    return df
+
+
+@db_session
 def total_cards() -> int:
     sql = "select count(1) from jira_card where status_agrupado <> 'Cancelado'"
     result = db.select(sql)
@@ -55,7 +85,7 @@ def cards_concludos_no_mes() -> int:
 
 
 @db_session
-def cards_por_mes():
+def cards_por_mes() -> pd.DataFrame:
     sql = """SELECT strftime('%Y-%m',criado) as Mês, 
                 tipo_agrupado,
                 sum(1) AS Cards
@@ -74,7 +104,7 @@ def cards_por_mes():
 
 
 @db_session
-def cards_concluido_por_mes():
+def cards_concluido_por_mes() -> pd.DataFrame:
     sql = """SELECT strftime('%Y-%m',data_conclusao), 
                 tipo_agrupado,
                 sum(1) AS Cards
@@ -92,7 +122,7 @@ def cards_concluido_por_mes():
 
 
 @db_session
-def cards_por_setor():
+def cards_por_setor() -> pd.DataFrame:
     sql = """SELECT pai, count(1)
             FROM jira_card
             WHERE status_agrupado <> 'Cancelado'
@@ -106,7 +136,7 @@ def cards_por_setor():
 
 
 @db_session
-def cards_concluido_por_mes_setor():
+def cards_concluido_por_mes_setor() -> pd.DataFrame:
     sql = """SELECT pai, count(1)
             FROM jira_vw_data_conclusao
             WHERE data_conclusao > date('now','start of month')
@@ -120,7 +150,7 @@ def cards_concluido_por_mes_setor():
 
 
 @db_session
-def cards_por_setor_status():
+def cards_por_setor_status() -> pd.DataFrame:
     sql = """SELECT pai, 
             sum(CASE
                 WHEN tipo_agrupado = "Evolutivo" THEN 1
@@ -143,7 +173,7 @@ def cards_por_setor_status():
 
 
 @db_session
-def apropriacao_por_tipo():
+def apropriacao_por_tipo() -> pd.DataFrame:
     sql = """SELECT strftime('%Y-%m',inicio) as Mes, 
                 cast((cast(sum(CASE
                     WHEN tipo_agrupado = "Evolutivo" THEN tempo
@@ -167,7 +197,7 @@ def apropriacao_por_tipo():
 
 
 @db_session
-def apropriacao_por_pai():
+def apropriacao_por_pai() -> pd.DataFrame:
     sql = """SELECT strftime('%Y-%m',inicio) as Mes, 
                     cast((cast(sum(CASE
                         WHEN pai = "CRL" THEN tempo
@@ -195,7 +225,7 @@ def apropriacao_por_pai():
 
 
 @db_session
-def diario_por_status():
+def diario_por_status() -> pd.DataFrame:
     sql = """SELECT data, status_agrupado, sum(quantidade)
             FROM jira_diario
             GROUP BY data, status_agrupado

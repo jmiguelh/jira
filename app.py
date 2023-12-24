@@ -6,11 +6,8 @@ import jira
 import models.painel as painel
 
 
-color_discrete_map = {
-    'Têxtil': 'olive',
-    'Comercial': 'orange', 
-    'CRL': 'royalblue'
-    }
+color_discrete_map = {"Têxtil": "olive", "Comercial": "orange", "CRL": "royalblue"}
+
 
 def barra_lateral():
     TIPO = ["Todos", "Evolutivo", "Corretivo"]
@@ -26,10 +23,10 @@ def barra_lateral():
     ]
     with st.sidebar:
         st.image("img/lunelli_colorida.png", width=250)
-        # with st.expander(":pushpin: Filtos"):
-        #     setor = st.selectbox("Setor:", SETOR)
-        #     tipo = st.selectbox("Tipo:", TIPO)
-        #     status = st.multiselect("Status:", STATUS, default=STATUS)
+        with st.expander(":pushpin: Filtos"):
+            setor = st.selectbox("Setor:", SETOR)
+            tipo = st.selectbox("Tipo:", TIPO)
+            status = st.multiselect("Status:", STATUS, default=STATUS)
         with st.expander(
             f":arrows_counterclockwise:Última atualização: {jira.ultima_atualzacao()}"
         ):
@@ -42,6 +39,7 @@ def barra_lateral():
 
         st.write("")
         st.image("img/salesforce_logo.png", width=150)
+        return (setor, tipo, status)
 
 
 def primeira_linha():
@@ -111,7 +109,7 @@ def primeira_linha():
         values="Quantidade",
         names="Setor",
         color="Setor",
-        color_discrete_map= color_discrete_map,
+        color_discrete_map=color_discrete_map,
     )
     fig.update_layout(
         legend=dict(
@@ -180,7 +178,7 @@ def segunda_linha():
         values="Quantidade",
         names="Setor",
         color="Setor",
-        color_discrete_map= color_discrete_map
+        color_discrete_map=color_discrete_map,
     )
     fig.update_layout(
         legend=dict(
@@ -226,7 +224,7 @@ def terceira_linha():
         y="Mês",
         text_auto=True,
         orientation="h",
-        color_discrete_map= color_discrete_map
+        color_discrete_map=color_discrete_map,
     )
     fig.update_layout(
         legend=dict(
@@ -264,7 +262,9 @@ def main():
         unsafe_allow_html=True,
     )
 
-    barra_lateral()
+    setor, tipo, status = barra_lateral()
+
+    df_cards = painel.carregar_cards()
 
     st.title("Salesforce Squad")
 
@@ -273,6 +273,13 @@ def main():
     segunda_linha()
 
     terceira_linha()
+
+    if setor != "Todos":
+        df_cards_filtrados = df_cards[df_cards.pai == setor]
+    else:
+        df_cards_filtrados = df_cards
+
+    df_cards_filtrados
 
 
 if __name__ == "__main__":
