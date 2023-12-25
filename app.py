@@ -41,7 +41,7 @@ def barra_lateral():
         return (setor, tipo, status)
 
 
-def primeira_linha():
+def primeira_linha(df: pd.DataFrame):
     corpo = st.container()
     a, b, c = corpo.columns(3)
 
@@ -262,30 +262,32 @@ def main():
     )
 
     setor, tipo, status = barra_lateral()
+    ### Filtros ###
+    df_cards = painel.carregar_cards()
+    if setor != "Todos":
+        df_cards_filtrados = df_cards[df_cards.pai == setor]
+    else:
+        df_cards_filtrados = df_cards
+
+    if tipo != "Todos":
+        df_cards_filtrados = df_cards_filtrados[
+            df_cards_filtrados.tipo_agrupado == tipo
+        ]
+
+    df_cards_filtrados = df_cards_filtrados[df_cards.status_agrupado.isin(status)]
+    df_cards_filtrados = df_cards_filtrados.sort_index(ascending=False)
 
     st.title("Salesforce Squad")
 
     tab1, tab2 = st.tabs(["Gráficos", "Dados"])
     with tab1:
-        primeira_linha()
+        primeira_linha(df_cards_filtrados)
 
         segunda_linha()
 
         terceira_linha()
 
     with tab2:
-        df_cards = painel.carregar_cards()
-        if setor != "Todos":
-            df_cards_filtrados = df_cards[df_cards.pai == setor]
-        else:
-            df_cards_filtrados = df_cards
-
-        if tipo != "Todos":
-            df_cards_filtrados = df_cards_filtrados[df_cards.tipo_agrupado == tipo]
-        df_cards_filtrados = df_cards_filtrados.sort_index(ascending=False)
-
-        df_cards_filtrados = df_cards_filtrados[df_cards.status_agrupado.isin(status)]
-
         st.write("Cards")
         st.dataframe(df_cards_filtrados, hide_index=True)
 
