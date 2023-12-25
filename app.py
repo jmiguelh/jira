@@ -5,22 +5,21 @@ import time
 import jira
 import models.painel as painel
 
-
-color_discrete_map = {"Têxtil": "olive", "Comercial": "orange", "CRL": "royalblue"}
+TIPO = ["Todos", "Evolutivo", "Corretivo"]
+SETOR = ["Todos", "CRL", "Comercial", "Têxtil"]
+STATUS = [
+    "Backlog",
+    "Especificação",
+    "Desenvolvimento",
+    "Homologação",
+    "Produção",
+    "Concluído",
+    "Systextil",
+]
+COLOR_DISCRETE_MAP = {"Têxtil": "olive", "Comercial": "orange", "CRL": "royalblue"}
 
 
 def barra_lateral():
-    TIPO = ["Todos", "Evolutivo", "Corretivo"]
-    SETOR = ["Todos", "CRL", "Comercial", "Têxtil"]
-    STATUS = [
-        "Backlog",
-        "Especificação",
-        "Desenvolvimento",
-        "Homologação",
-        "Produção",
-        "Concluído",
-        "Systextil",
-    ]
     with st.sidebar:
         st.image("img/lunelli_colorida.png", width=250)
         with st.expander(":pushpin: Filtos"):
@@ -109,7 +108,7 @@ def primeira_linha():
         values="Quantidade",
         names="Setor",
         color="Setor",
-        color_discrete_map=color_discrete_map,
+        color_discrete_map=COLOR_DISCRETE_MAP,
     )
     fig.update_layout(
         legend=dict(
@@ -178,7 +177,7 @@ def segunda_linha():
         values="Quantidade",
         names="Setor",
         color="Setor",
-        color_discrete_map=color_discrete_map,
+        color_discrete_map=COLOR_DISCRETE_MAP,
     )
     fig.update_layout(
         legend=dict(
@@ -224,7 +223,7 @@ def terceira_linha():
         y="Mês",
         text_auto=True,
         orientation="h",
-        color_discrete_map=color_discrete_map,
+        color_discrete_map=COLOR_DISCRETE_MAP,
     )
     fig.update_layout(
         legend=dict(
@@ -264,22 +263,31 @@ def main():
 
     setor, tipo, status = barra_lateral()
 
-    df_cards = painel.carregar_cards()
-
     st.title("Salesforce Squad")
 
-    primeira_linha()
+    tab1, tab2 = st.tabs(["Gráficos", "Dados"])
+    with tab1:
+        primeira_linha()
 
-    segunda_linha()
+        segunda_linha()
 
-    terceira_linha()
+        terceira_linha()
 
-    if setor != "Todos":
-        df_cards_filtrados = df_cards[df_cards.pai == setor]
-    else:
-        df_cards_filtrados = df_cards
+    with tab2:
+        df_cards = painel.carregar_cards()
+        if setor != "Todos":
+            df_cards_filtrados = df_cards[df_cards.pai == setor]
+        else:
+            df_cards_filtrados = df_cards
 
-    df_cards_filtrados
+        if tipo != "Todos":
+            df_cards_filtrados = df_cards_filtrados[df_cards.tipo_agrupado == tipo]
+        df_cards_filtrados = df_cards_filtrados.sort_index(ascending=False)
+
+        df_cards_filtrados = df_cards_filtrados[df_cards.status_agrupado.isin(status)]
+
+        st.write("Cards")
+        st.dataframe(df_cards_filtrados, hide_index=True)
 
 
 if __name__ == "__main__":
