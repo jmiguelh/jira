@@ -27,7 +27,7 @@ def barra_lateral():
             tipo = st.selectbox("Tipo:", TIPO)
             status = st.multiselect("Status:", STATUS, default=STATUS)
         with st.expander(
-            f":arrows_counterclockwise:Última atualização: {jira.ultima_atualzacao()}"
+            f":arrows_counterclockwise: Última atualização: {jira.ultima_atualzacao()}"
         ):
             if st.button("Recarregar dados"):
                 with st.spinner("Carregando..."):
@@ -41,7 +41,7 @@ def barra_lateral():
         return (setor, tipo, status)
 
 
-def primeira_linha(df: pd.DataFrame):
+def primeira_linha():
     corpo = st.container()
     a, b, c = corpo.columns(3)
 
@@ -274,20 +274,21 @@ def main():
             df_cards_filtrados.tipo_agrupado == tipo
         ]
 
-    df_cards_filtrados = df_cards_filtrados[df_cards.status_agrupado.isin(status)]
+    df_cards_filtrados = df_cards_filtrados.loc[df_cards.status_agrupado.isin(status)]
     df_cards_filtrados = df_cards_filtrados.sort_index(ascending=False)
 
     st.title("Salesforce Squad")
 
     tab1, tab2 = st.tabs(["Gráficos", "Dados"])
     with tab1:
-        primeira_linha(df_cards_filtrados)
+        primeira_linha()
 
         segunda_linha()
 
         terceira_linha()
 
     with tab2:
+        st.metric(label="Total de cards", value=len(df_cards_filtrados))
         st.write("Cards")
         st.dataframe(df_cards_filtrados, hide_index=True)
 
