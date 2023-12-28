@@ -61,3 +61,8 @@ CREATE VIEW jira_vw_data_conclusao AS
      WHERE status_agrupado = 'Concluído' AND 
            s.para IN ('Done', 'Concluído Systextil') 
      GROUP BY c.chave;
+
+CREATE TABLE "jira_prioridade" (
+  "chave" VARCHAR(10) NOT NULL PRIMARY KEY,
+  "ordem" INTEGER NOT NULL
+);

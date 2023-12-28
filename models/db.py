@@ -70,6 +70,12 @@ def diario():
     cursor = db.execute(sql)
 
 
+class Prioridade(db.Entity):
+    _table_ = "jira_prioridade"
+    chave = PrimaryKey(str, 10, auto=True)
+    ordem = Required(int, default=0)
+
+
 # result = db.select("select * from jira_card where status_agrupado <> 'Cancelado'")
 # colunas = ['id', 'chave', 'tipo', 'desricao', 'prioridade', 'status', 'criado', 'alterado', 'pai', 'tempo_total', 'categoria', 'categoria_alterada', 'status_agrupado', 'tipo_agrupado']
 # a = pd.DataFrame(resultcolumns=colunas)
