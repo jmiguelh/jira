@@ -19,7 +19,7 @@ def carregar_cards() -> pd.DataFrame:
             "id",
             "chave",
             "tipo",
-            "desricao",
+            "descricao",
             "prioridade",
             "status",
             "criado",
@@ -33,6 +33,22 @@ def carregar_cards() -> pd.DataFrame:
         ],
     )
     df = df.set_index("id")
+    return df
+
+
+@db_session
+def carregar_prioridade() -> pd.DataFrame:
+    sql = """SELECT chave, ordem
+            FROM jira_prioridade;"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "chave",
+            "ordem",
+        ],
+    )
+    df = df.set_index("chave")
     return df
 
 

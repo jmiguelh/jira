@@ -238,6 +238,14 @@ def terceira_linha():
     b.plotly_chart(fig, use_container_width=True)
 
 
+def colorir_linha(row):
+    cor = [
+        "background-color: yellow" if row["status_agrupado"] != "Backlog" else ""
+        for _ in row.index
+    ]
+    return cor
+
+
 def main():
     st.set_page_config(
         page_title="Lunelli - Salesforce Squad",
@@ -279,7 +287,8 @@ def main():
 
     st.title("Salesforce Squad")
 
-    tab1, tab2 = st.tabs(["Gráficos", "Dados"])
+    tab1, tab2, tab3 = st.tabs(["Gráficos", "Prioridade", "Dados"])
+    ### Gráficos ###
     with tab1:
         primeira_linha()
 
@@ -287,7 +296,53 @@ def main():
 
         terceira_linha()
 
+    ### Prioridade ###
     with tab2:
+        df_prioridade = pd.merge(
+            df_cards, painel.carregar_prioridade(), how="left", on=["chave"]
+        )
+        df_prioridade = df_prioridade.set_index("chave")
+
+        st.subheader("Comercial")
+        df = df_prioridade.loc[
+            (df_prioridade.tipo_agrupado == "Evolutivo")
+            & (df_prioridade.pai == "Comercial")
+        ]
+        df["ordem"] = df["ordem"].fillna(0)
+        df = df.loc[
+            (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
+        ]
+        df = df[["descricao", "ordem", "status_agrupado"]]
+        df = df.sort_values(by=["ordem", "status_agrupado"], ascending=False)
+        st.dataframe(df.style.apply(colorir_linha, axis=1))
+
+        st.subheader("Têxtil")
+        df = df_prioridade.loc[
+            (df_prioridade.tipo_agrupado == "Evolutivo")
+            & (df_prioridade.pai == "Têxtil")
+        ]
+        df["ordem"] = df["ordem"].fillna(4)
+        df = df.loc[
+            (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
+        ]
+        df = df[["descricao", "ordem", "status_agrupado"]]
+        df = df.sort_values(by=["ordem", "status_agrupado"])
+        st.dataframe(df.style.apply(colorir_linha, axis=1))
+
+        st.subheader("CRL")
+        df = df_prioridade.loc[
+            (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
+        ]
+        df["ordem"] = df["ordem"].fillna(4)
+        df = df.loc[
+            (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
+        ]
+        df = df[["descricao", "ordem", "status_agrupado"]]
+        df = df.sort_values(by=["ordem", "status_agrupado"], ascending=False)
+        st.dataframe(df.style.apply(colorir_linha, axis=1))
+
+    ### Dados ###
+    with tab3:
         st.metric(label="Total de cards", value=len(df_cards_filtrados))
         st.write("Cards")
         st.dataframe(df_cards_filtrados, hide_index=True)
