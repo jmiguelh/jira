@@ -256,7 +256,7 @@ def main():
     ### Remover o botão Deploy
     st.markdown(
         """
-            <style>
+           <style>
                 .reportview-container {
                     margin-top: -2em;
                 }
@@ -312,9 +312,14 @@ def main():
         df = df.loc[
             (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
         ]
-        df = df[["descricao", "ordem", "status_agrupado"]]
-        df = df.sort_values(by=["ordem", "status_agrupado"], ascending=False)
-        st.dataframe(df.style.apply(colorir_linha, axis=1))
+        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df.sort_values(
+            by=["ordem", "status_agrupado", "DiasUltStatus"], ascending=False
+        )
+        df = df.style.apply(colorir_linha, axis=1).format(
+            {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}"}
+        )
+        st.dataframe(df)
 
         st.subheader("Têxtil")
         df = df_prioridade.loc[
@@ -325,9 +330,12 @@ def main():
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
-        df = df[["descricao", "ordem", "status_agrupado"]]
-        df = df.sort_values(by=["ordem", "status_agrupado"])
-        st.dataframe(df.style.apply(colorir_linha, axis=1))
+        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
+        df = df.style.apply(colorir_linha, axis=1).format(
+            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
+        )
+        st.dataframe(df)
 
         st.subheader("CRL")
         df = df_prioridade.loc[
@@ -337,9 +345,14 @@ def main():
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
-        df = df[["descricao", "ordem", "status_agrupado"]]
-        df = df.sort_values(by=["ordem", "status_agrupado"], ascending=False)
-        st.dataframe(df.style.apply(colorir_linha, axis=1))
+        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df.sort_values(
+            by=["ordem", "status_agrupado", "DiasUltStatus"], ascending=False
+        )
+        df = df.style.apply(colorir_linha, axis=1).format(
+            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
+        )
+        st.dataframe(df)
 
     ### Dados ###
     with tab3:

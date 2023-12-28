@@ -8,10 +8,17 @@ db = Database()
 
 @db_session
 def carregar_cards() -> pd.DataFrame:
-    sql = """select id, chave, tipo, desricao, prioridade, status, criado, 
+    sql = """SELECT c.id, c.chave, tipo, desricao, prioridade, status, criado, 
                 alterado, pai, tempo_total, categoria, categoria_alterada, 
-                status_agrupado, tipo_agrupado 
-            from jira_card where status_agrupado <> 'Cancelado'"""
+                status_agrupado, tipo_agrupado, max(s.datahora) as DataUltStatus,
+                CAST ((JulianDay('now') - JulianDay(max(s.datahora)))  As Integer) as DiasUltStatus
+            FROM jira_card as c
+            LEFT JOIN jira_status as s
+            ON c.chave = s.chave
+            WHERE status_agrupado <> "Cancelado"
+            GROUP BY c.id, c.chave, tipo, desricao, prioridade, status, criado, 
+                alterado, pai, tempo_total, categoria, categoria_alterada, 
+                status_agrupado, tipo_agrupado """
     result = db.select(sql)
     df = pd.DataFrame(
         result,
@@ -30,6 +37,8 @@ def carregar_cards() -> pd.DataFrame:
             "categoria_alterada",
             "status_agrupado",
             "tipo_agrupado",
+            "DataUltStatus",
+            "DiasUltStatus",
         ],
     )
     df = df.set_index("id")
