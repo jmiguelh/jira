@@ -309,6 +309,7 @@ def main():
             & (df_prioridade.pai == "Comercial")
         ]
         df["ordem"] = df["ordem"].fillna(0)
+        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
         ]
@@ -319,7 +320,7 @@ def main():
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}"}
         )
-        st.dataframe(df)
+        st.dataframe(df, use_container_width=True)
 
         st.subheader("Têxtil")
         df = df_prioridade.loc[
@@ -327,6 +328,7 @@ def main():
             & (df_prioridade.pai == "Têxtil")
         ]
         df["ordem"] = df["ordem"].fillna(4)
+        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
@@ -335,13 +337,14 @@ def main():
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )
-        st.dataframe(df)
+        st.dataframe(df, use_container_width=True)
 
         st.subheader("CRL")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
         ]
         df["ordem"] = df["ordem"].fillna(4)
+        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
@@ -352,7 +355,7 @@ def main():
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )
-        st.dataframe(df)
+        st.dataframe(df, use_container_width=True)
 
     ### Dados ###
     with tab3:
