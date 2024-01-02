@@ -309,7 +309,7 @@ def main():
             & (df_prioridade.pai == "Comercial")
         ]
         df["ordem"] = df["ordem"].fillna(0)
-        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
         ]
@@ -328,7 +328,7 @@ def main():
             & (df_prioridade.pai == "Têxtil")
         ]
         df["ordem"] = df["ordem"].fillna(4)
-        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
@@ -344,7 +344,7 @@ def main():
             (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
         ]
         df["ordem"] = df["ordem"].fillna(4)
-        df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
