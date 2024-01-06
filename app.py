@@ -302,7 +302,8 @@ def main():
             df_cards, painel.carregar_prioridade(), how="left", on=["chave"]
         )
         df_prioridade = df_prioridade.set_index("chave")
-
+        
+        ### Comrcial ###
         st.subheader("Comercial")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo")
@@ -322,6 +323,7 @@ def main():
         )
         st.dataframe(df, use_container_width=True)
 
+        ### Têxtil ###
         st.subheader("Têxtil")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo")
@@ -339,6 +341,7 @@ def main():
         )
         st.dataframe(df, use_container_width=True)
 
+        ### CRL ###
         st.subheader("CRL")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")

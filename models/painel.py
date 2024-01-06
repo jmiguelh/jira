@@ -261,6 +261,18 @@ def diario_por_status() -> pd.DataFrame:
     return df
 
 
+@db_session
+def diario() -> pd.DataFrame:
+    sql = """SELECT * 
+            FROM jira_diario
+            WHERE data = (SELECT max(data) FROM jira_diario)
+            AND status_agrupado NOT in ('Cancelado', 'Concluído', 'Backlog')"""
+    result = db.select(sql)
+    df = pd.DataFrame(result, columns=["Data", "Status", "Setor", "Tipo", "Quantidade"])
+    df = df.set_index("Data")
+    return df
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
