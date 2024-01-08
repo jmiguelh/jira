@@ -302,15 +302,14 @@ def main():
             df_cards, painel.carregar_prioridade(), how="left", on=["chave"]
         )
         df_prioridade = df_prioridade.set_index("chave")
-        
+
         ### Comrcial ###
         st.subheader("Comercial")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo")
             & (df_prioridade.pai == "Comercial")
         ]
-        df["ordem"] = df["ordem"].fillna(0)
-        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        df["ordem"].fillna(0, inplace=True)
         df = df.loc[
             (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
         ]
@@ -329,8 +328,7 @@ def main():
             (df_prioridade.tipo_agrupado == "Evolutivo")
             & (df_prioridade.pai == "Têxtil")
         ]
-        df["ordem"] = df["ordem"].fillna(4)
-        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        df["ordem"].fillna(4, inplace=True)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
@@ -346,8 +344,7 @@ def main():
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
         ]
-        df["ordem"] = df["ordem"].fillna(4)
-        # df["DiasUltStatus"] = df["DiasUltStatus"].fillna(100)
+        df["ordem"].fillna(4, inplace=True)
         df = df.loc[
             (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
         ]
