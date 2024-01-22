@@ -310,10 +310,10 @@ def quarta_linha():
 
 def colorir_linha(row):
     cor = [
-        "background-color: yellow"
+        "background-color: #f2f28d"
         if row["status_agrupado"] != "1- Baclog"
         and row["status_agrupado"] != "0 - Concluído"
-        else "background-color: green"
+        else "background-color: lightgreen"
         if row["status_agrupado"] == "0 - Concluído"
         else ""
         for _ in row.index
