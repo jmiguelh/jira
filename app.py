@@ -312,9 +312,9 @@ def colorir_linha(row):
     cor = [
         "background-color: yellow"
         if row["status_agrupado"] != "1- Baclog"
-        and row["status_agrupado"] != "6 - Concluído"
+        and row["status_agrupado"] != "0 - Concluído"
         else "background-color: green"
-        if row["status_agrupado"] == "6 - Concluído"
+        if row["status_agrupado"] == "0 - Concluído"
         else ""
         for _ in row.index
     ]
@@ -381,25 +381,29 @@ def main():
         df_prioridade = df_prioridade.set_index("chave")
 
         ### Comrcial ###
-        st.subheader("Comercial")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo")
             & (df_prioridade.pai == "Comercial")
         ]
         df["ordem"].fillna(0, inplace=True)
         df = df.loc[
-            (df.ordem != 0) | ((df.status_agrupado != "Concluído") & (df.ordem == 0))
+            (df.ordem != 0)
+            | (df.status_agrupado != "Concluído")
+            | (df.criado > "20231213")
         ]
+
         df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
-        df = df.replace(
+        df.replace(
             {
                 "Backlog": "1- Baclog",
                 "Especificação": "2 - Especificação.",
                 "Desenvolvimento": "3 - Desenvolvimento.",
                 "Homologação": "4 - Homologação.",
                 "Produção": "5 - Produção",
-                "Concluído": "6 - Concluído",
-            }
+                "Concluído": "0 - Concluído",
+                "Systextil": "6 - Systextil",
+            },
+            inplace=True,
         )
         df = df.sort_values(
             by=["ordem", "status_agrupado", "DiasUltStatus"],
@@ -408,17 +412,19 @@ def main():
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}"}
         )
+        st.subheader(f"Comercial - {len(df.index)}")
         st.dataframe(df, use_container_width=True)
 
         ### Têxtil ###
-        st.subheader("Têxtil")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo")
             & (df_prioridade.pai == "Têxtil")
         ]
         df["ordem"].fillna(4, inplace=True)
         df = df.loc[
-            (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
+            (df.ordem != 4)
+            | (df.status_agrupado != "Concluído")
+            | (df.criado > "20231213")
         ]
         df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
         df = df.replace(
@@ -428,23 +434,26 @@ def main():
                 "Desenvolvimento": "3 - Desenvolvimento.",
                 "Homologação": "4 - Homologação.",
                 "Produção": "5 - Produção",
-                "Concluído": "6 - Concluído",
+                "Concluído": "0 - Concluído",
+                "Systextil": "6 - Systextil",
             }
         )
         df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )
+        st.subheader(f"Têxtil - {len(df.index)}")
         st.dataframe(df, use_container_width=True)
 
         ### CRL ###
-        st.subheader("CRL")
         df = df_prioridade.loc[
             (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
         ]
         df["ordem"].fillna(4, inplace=True)
         df = df.loc[
-            (df.ordem != 4) | ((df.status_agrupado != "Concluído") & (df.ordem == 4))
+            (df.ordem != 4)
+            | (df.status_agrupado != "Concluído")
+            | (df.criado > "20231213")
         ]
         df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
         df = df.replace(
@@ -454,7 +463,8 @@ def main():
                 "Desenvolvimento": "3 - Desenvolvimento.",
                 "Homologação": "4 - Homologação.",
                 "Produção": "5 - Produção",
-                "Concluído": "6 - Concluído",
+                "Concluído": "0 - Concluído",
+                "Systextil": "6 - Systextil",
             }
         )
         df = df.sort_values(
@@ -463,6 +473,7 @@ def main():
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )
+        st.subheader(f"CRL - {len(df.index)}")
         st.dataframe(df, use_container_width=True)
 
     ### Dados ###
