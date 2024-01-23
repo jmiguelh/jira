@@ -258,18 +258,36 @@ def diario_por_status() -> pd.DataFrame:
             AND data > date('now','-30 days');"""
     result = db.select(sql)
     df = pd.DataFrame(result, columns=["Data", "Status", "Cards"])
+    df = df.replace(
+        {
+            "Backlog": "1- Baclog",
+            "Especificação": "2 - Especif.",
+            "Desenvolvimento": "3 - Desenv.",
+            "Homologação": "4 - Homolog.",
+            "Produção": "5 - Prod.",
+        }
+    )
+    df = df.sort_values(by=["Status"])
     return df
 
 
 @db_session
-def diario() -> pd.DataFrame:
-    sql = """SELECT * 
+def diario(dias: int = 0) -> pd.DataFrame:
+    where = f" WHERE data <= date('now','-{dias} day')" if dias > 0 else ""
+    sql = f"""SELECT status_agrupado, pai,  tipo_agrupado, quantidade 
             FROM jira_diario
-            WHERE data = (SELECT max(data) FROM jira_diario)
-            AND status_agrupado NOT in ('Cancelado', 'Concluído', 'Backlog')"""
+            WHERE data = (SELECT max(data) FROM jira_diario{where})
+            AND status_agrupado NOT in ('Cancelado', 'Concluído', 'Backlog','Systextil')"""
     result = db.select(sql)
-    df = pd.DataFrame(result, columns=["Data", "Status", "Setor", "Tipo", "Quantidade"])
-    df = df.set_index("Data")
+    df = pd.DataFrame(result, columns=["Status", "Setor", "Tipo", "Quantidade"])
+    df = df.replace(
+        {
+            "Especificação": "1 - Especificação",
+            "Desenvolvimento": "2 - Desenvolvimento",
+            "Homologação": "3 - Homologação",
+            "Produção": "4 - Produção",
+        }
+    )
     return df
 
 
