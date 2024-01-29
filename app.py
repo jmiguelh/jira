@@ -262,6 +262,13 @@ def quarta_linha():
     df7 = painel.diario(7)
     df7 = df7.groupby(["Status"]).sum()
 
+    linha = a.container()
+    a1, a2 = linha.columns(2)
+    a1.metric(
+        label="Total de cards no quadro",
+        value=df.Quantidade.sum(),
+        delta=(int(df.Quantidade.sum() - df7.Quantidade.sum())),
+    )
     a.write("Total de cards por status")
     linha = a.container()
     a1, a2 = linha.columns(2)
