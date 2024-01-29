@@ -51,6 +51,8 @@ def primeira_linha():
     total_cards_concluidos = painel.total_cards_concluidos()
     cards_conluidos_ultimo_dia = painel.cards_conluidos_ultimo_dia()
     cards_concludos_no_mes = painel.cards_concludos_no_mes()
+    dftipo = painel.total_cards_tipo()
+    dftipo7 = painel.total_cards_tipo(30)
 
     linha = a.container()
     a1, a2 = linha.columns(2)
@@ -80,6 +82,19 @@ def primeira_linha():
         label="Cards concluídos no mês",
         value=cards_concludos_no_mes,
         delta=cards_aberto_no_mes - cards_concludos_no_mes,
+    )
+
+    linha = a.container()
+    a1, a2 = linha.columns(2)
+    a1.metric(
+        label="Total de Cards Evolutivos",
+        value=dftipo.loc["Evolutivo"],
+        delta=int(dftipo.loc["Evolutivo"] - dftipo7.loc["Evolutivo"]),
+    )
+    a2.metric(
+        label="Total de Cards Corretivos",
+        value=dftipo.loc["Corretivo"],
+        delta=int(dftipo.loc["Corretivo"] - dftipo7.loc["Corretivo"]),
     )
 
     b.write("Cards aberto por mês")
@@ -467,9 +482,7 @@ def main():
                 "Systextil": "6 - Systextil",
             }
         )
-        df = df.sort_values(
-            by=["ordem", "status_agrupado", "DiasUltStatus"], ascending=False
-        )
+        df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )

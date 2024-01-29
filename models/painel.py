@@ -291,6 +291,20 @@ def diario(dias: int = 0) -> pd.DataFrame:
     return df
 
 
+@db_session
+def total_cards_tipo(dias: int = 0) -> pd.DataFrame:
+    sql = f"""SELECT tipo_agrupado, SUM(quantidade)
+                FROM jira_diario
+                WHERE data = (SELECT max(data) FROM jira_diario WHERE data <= date('now','-{dias} day'))
+                AND status_agrupado NOT in ('Cancelado', 'Concluído')
+                GROUP BY tipo_agrupado;
+            """
+    result = db.select(sql)
+    df = pd.DataFrame(result, columns=["Tipo", "Quantidade"])
+    df = df.set_index("Tipo")
+    return df
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
