@@ -14,7 +14,7 @@ STATUS = [
     "Homologação",
     "Produção",
     "Concluído",
-    "Systextil",
+    # "Systextil",
 ]
 COLOR_DISCRETE_MAP = {"Têxtil": "olive", "Comercial": "orange", "CRL": "royalblue"}
 
