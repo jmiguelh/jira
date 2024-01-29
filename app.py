@@ -482,9 +482,7 @@ def main():
                 "Systextil": "6 - Systextil",
             }
         )
-        df = df.sort_values(
-            by=["ordem", "status_agrupado", "DiasUltStatus"], ascending=False
-        )
+        df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
         df = df.style.apply(colorir_linha, axis=1).format(
             {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
         )
