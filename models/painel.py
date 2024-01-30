@@ -15,7 +15,7 @@ def carregar_cards() -> pd.DataFrame:
             FROM jira_card as c
             LEFT JOIN jira_status as s
             ON c.chave = s.chave
-            WHERE status_agrupado <> "Cancelado"
+            WHERE status_agrupado not in ('Cancelado', 'Systextil')
             GROUP BY c.id, c.chave, tipo, desricao, prioridade, status, criado, 
                 alterado, pai, tempo_total, categoria, categoria_alterada, 
                 status_agrupado, tipo_agrupado """
@@ -63,21 +63,21 @@ def carregar_prioridade() -> pd.DataFrame:
 
 @db_session
 def total_cards() -> int:
-    sql = "select count(1) from jira_card where status_agrupado <> 'Cancelado'"
+    sql = "select count(1) from jira_card where status_agrupado not in ('Cancelado', 'Systextil')"
     result = db.select(sql)
     return result[0]
 
 
 @db_session
 def cards_aberto_ultimo_dia() -> int:
-    sql = "select count(1) from jira_card where status_agrupado <> 'Cancelado' and criado > date('now','-1 day')"
+    sql = "select count(1) from jira_card where status_agrupado not in ('Cancelado', 'Systextil') and criado > date('now','-1 day')"
     result = db.select(sql)
     return result[0]
 
 
 @db_session
 def cards_aberto_no_mes() -> int:
-    sql = "select count(1) from jira_card where status_agrupado <> 'Cancelado' and criado > date('now','start of month')"
+    sql = "select count(1) from jira_card where status_agrupado not in ('Cancelado', 'Systextil') and criado > date('now','start of month')"
     result = db.select(sql)
     return result[0]
 
@@ -115,7 +115,7 @@ def cards_por_mes() -> pd.DataFrame:
                 tipo_agrupado,
                 sum(1) AS Cards
             FROM jira_card
-            WHERE status_agrupado <> 'Cancelado'
+            WHERE status_agrupado not in ('Cancelado', 'Systextil')
                 AND criado > date(date('now','start of month'),'-5 month')
             GROUP BY strftime('%Y-%m',criado), tipo_agrupado
             ORDER BY 1 DESC"""
@@ -150,7 +150,7 @@ def cards_concluido_por_mes() -> pd.DataFrame:
 def cards_por_setor() -> pd.DataFrame:
     sql = """SELECT pai, count(1)
             FROM jira_card
-            WHERE status_agrupado <> 'Cancelado'
+            WHERE status_agrupado not in ('Cancelado', 'Systextil')
             GROUP BY pai"""
     result = db.select(sql)
     df = pd.DataFrame(
@@ -186,7 +186,7 @@ def cards_por_setor_status() -> pd.DataFrame:
                 ELSE 0
             END) AS Corretivo
             FROM jira_card
-            WHERE status_agrupado <> 'Cancelado'
+            WHERE status_agrupado not in ('Cancelado', 'Systextil')
             GROUP BY pai"""
     result = db.select(sql)
     df = pd.DataFrame(
@@ -211,7 +211,7 @@ def apropriacao_por_tipo() -> pd.DataFrame:
             FROM jira_card as c
             INNER JOIN jira_apropriacao as a 
             ON c.id = a.card_id
-            WHERE c.status_agrupado <> 'Cancelado'
+            WHERE c.status_agrupado not in ('Cancelado', 'Systextil')
             GROUP BY strftime('%Y-%m',inicio)
             ORDER BY 1 DESC
             LIMIT 6"""
@@ -239,7 +239,7 @@ def apropriacao_por_pai() -> pd.DataFrame:
                 FROM jira_card as c
                 INNER JOIN jira_apropriacao as a 
                 ON c.id = a.card_id
-                WHERE c.status_agrupado <> 'Cancelado'
+                WHERE c.status_agrupado not in ('Cancelado', 'Systextil')
                 GROUP BY strftime('%Y-%m',inicio)
                 ORDER BY 1 DESC
                 LIMIT 6"""
@@ -296,7 +296,7 @@ def total_cards_tipo(dias: int = 0) -> pd.DataFrame:
     sql = f"""SELECT tipo_agrupado, SUM(quantidade)
                 FROM jira_diario
                 WHERE data = (SELECT max(data) FROM jira_diario WHERE data <= date('now','-{dias} day'))
-                AND status_agrupado NOT in ('Cancelado', 'Concluído')
+                AND status_agrupado NOT in ('Cancelado', 'Concluído','Systextil')
                 GROUP BY tipo_agrupado;
             """
     result = db.select(sql)

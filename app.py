@@ -14,7 +14,7 @@ STATUS = [
     "Homologação",
     "Produção",
     "Concluído",
-    "Systextil",
+    # "Systextil",
 ]
 COLOR_DISCRETE_MAP = {"Têxtil": "olive", "Comercial": "orange", "CRL": "royalblue"}
 
@@ -262,6 +262,13 @@ def quarta_linha():
     df7 = painel.diario(7)
     df7 = df7.groupby(["Status"]).sum()
 
+    linha = a.container()
+    a1, a2 = linha.columns(2)
+    a1.metric(
+        label="Total de cards no quadro",
+        value=df.Quantidade.sum(),
+        delta=(int(df.Quantidade.sum() - df7.Quantidade.sum())),
+    )
     a.write("Total de cards por status")
     linha = a.container()
     a1, a2 = linha.columns(2)
@@ -493,6 +500,7 @@ def main():
     with tab3:
         st.metric(label="Total de cards", value=len(df_cards_filtrados))
         st.write("Cards")
+        df_cards_filtrados["tempo_total"] = df_cards_filtrados["tempo_total"] / 3600
         st.dataframe(df_cards_filtrados, hide_index=True)
 
 
