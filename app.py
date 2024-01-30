@@ -500,6 +500,7 @@ def main():
     with tab3:
         st.metric(label="Total de cards", value=len(df_cards_filtrados))
         st.write("Cards")
+        df_cards_filtrados["tempo_total"] = df_cards_filtrados["tempo_total"] / 3600
         st.dataframe(df_cards_filtrados, hide_index=True)
 
 
