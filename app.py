@@ -369,6 +369,10 @@ def main():
     setor, tipo, status = barra_lateral()
     ### Filtros ###
     df_cards = painel.carregar_cards()
+    df_cards = pd.merge(df_cards, painel.carregar_apropriacao(), how="left", on=["id"])
+    df_cards["apropriacao"] = df_cards["apropriacao"] / 3600
+    df_cards["apropriacao"].fillna(0, inplace=True)
+
     if setor != "Todos":
         df_cards_filtrados = df_cards[df_cards.pai == setor]
     else:
@@ -414,7 +418,9 @@ def main():
             | (df.criado > "20231213")
         ]
 
-        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df[
+            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
+        ]
         df.replace(
             {
                 "Backlog": "1- Baclog",
@@ -432,7 +438,7 @@ def main():
             ascending=[False, True, True],
         )
         df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}"}
+            {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
         )
         st.subheader(f"Comercial - {len(df.index)}")
         st.dataframe(df, use_container_width=True)
@@ -448,7 +454,9 @@ def main():
             | (df.status_agrupado != "Concluído")
             | (df.criado > "20231213")
         ]
-        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df[
+            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
+        ]
         df = df.replace(
             {
                 "Backlog": "1- Baclog",
@@ -462,7 +470,7 @@ def main():
         )
         df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
         df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
+            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
         )
         st.subheader(f"Têxtil - {len(df.index)}")
         st.dataframe(df, use_container_width=True)
@@ -477,7 +485,9 @@ def main():
             | (df.status_agrupado != "Concluído")
             | (df.criado > "20231213")
         ]
-        df = df[["descricao", "ordem", "status_agrupado", "DiasUltStatus"]]
+        df = df[
+            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
+        ]
         df = df.replace(
             {
                 "Backlog": "1- Baclog",
@@ -491,7 +501,7 @@ def main():
         )
         df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
         df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}"}
+            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
         )
         st.subheader(f"CRL - {len(df.index)}")
         st.dataframe(df, use_container_width=True)

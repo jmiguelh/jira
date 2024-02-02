@@ -46,6 +46,25 @@ def carregar_cards() -> pd.DataFrame:
 
 
 @db_session
+def carregar_apropriacao() -> pd.DataFrame:
+    sql = """SELECT a.card_id,
+                    sum(a.tempo) as apropriacao
+                FROM jira_apropriacao as a 
+                WHERE a.inicio > date('now', '-15 day') 
+                GROUP BY a.card_id;"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "id",
+            "apropriacao",
+        ],
+    )
+    df = df.set_index("id")
+    return df
+
+
+@db_session
 def carregar_prioridade() -> pd.DataFrame:
     sql = """SELECT chave, ordem
             FROM jira_prioridade;"""
