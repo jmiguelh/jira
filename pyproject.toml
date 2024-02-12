@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jira"
-version = "1.1.1"
+version = "1.2.0"
 description = ""
 authors = ["Miguel Henriques <github@jmh.com.br>"]
 readme = "README.md"
@@ -13,6 +13,7 @@ pony = "^0.7.17"
 streamlit = "^1.29.0"
 plotly = "^5.18.0"
 atlassian-python-api = "^3.41.4"
+schedule = "^1.2.1"
 
 
 [tool.poetry.group.dev.dependencies]
