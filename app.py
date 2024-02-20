@@ -332,12 +332,16 @@ def quarta_linha():
 
 def colorir_linha(row):
     cor = [
-        "background-color: #f2f28d"
-        if row["status_agrupado"] != "1- Baclog"
-        and row["status_agrupado"] != "0 - Concluído"
-        else "background-color: lightgreen"
-        if row["status_agrupado"] == "0 - Concluído"
-        else ""
+        (
+            "background-color: #f2f28d"
+            if row["status_agrupado"] != "1- Baclog"
+            and row["status_agrupado"] != "0 - Concluído"
+            else (
+                "background-color: lightgreen"
+                if row["status_agrupado"] == "0 - Concluído"
+                else ""
+            )
+        )
         for _ in row.index
     ]
     return cor
@@ -406,105 +410,129 @@ def main():
         )
         df_prioridade = df_prioridade.set_index("chave")
 
-        ### Comrcial ###
-        df = df_prioridade.loc[
-            (df_prioridade.tipo_agrupado == "Evolutivo")
-            & (df_prioridade.pai == "Comercial")
-        ]
-        df["ordem"].fillna(0, inplace=True)
-        df = df.loc[
-            (df.ordem != 0)
-            | (df.status_agrupado != "Concluído")
-            | (df.criado > "20231213")
-        ]
+        tab4, tab5, tab6 = st.tabs(["Comercial", "Têxtil", "CRL"])
 
-        df = df[
-            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
-        ]
-        df.replace(
-            {
-                "Backlog": "1- Baclog",
-                "Especificação": "2 - Especificação.",
-                "Desenvolvimento": "3 - Desenvolvimento.",
-                "Homologação": "4 - Homologação.",
-                "Produção": "5 - Produção",
-                "Concluído": "0 - Concluído",
-                "Systextil": "6 - Systextil",
-            },
-            inplace=True,
-        )
-        df = df.sort_values(
-            by=["ordem", "status_agrupado", "DiasUltStatus"],
-            ascending=[False, True, True],
-        )
-        df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
-        )
-        st.subheader(f"Comercial - {len(df.index)}")
-        st.dataframe(df, use_container_width=True)
+        with tab4:
+            ### Comrcial ###
+            df = df_prioridade.loc[
+                (df_prioridade.tipo_agrupado == "Evolutivo")
+                & (df_prioridade.pai == "Comercial")
+            ]
+            df["ordem"].fillna(0, inplace=True)
+            df = df.loc[
+                (df.ordem != 0)
+                | (df.status_agrupado != "Concluído")
+                | (df.criado > "20231213")
+            ]
 
-        ### Têxtil ###
-        df = df_prioridade.loc[
-            (df_prioridade.tipo_agrupado == "Evolutivo")
-            & (df_prioridade.pai == "Têxtil")
-        ]
-        df["ordem"].fillna(4, inplace=True)
-        df = df.loc[
-            (df.ordem != 4)
-            | (df.status_agrupado != "Concluído")
-            | (df.criado > "20231213")
-        ]
-        df = df[
-            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
-        ]
-        df = df.replace(
-            {
-                "Backlog": "1- Baclog",
-                "Especificação": "2 - Especificação.",
-                "Desenvolvimento": "3 - Desenvolvimento.",
-                "Homologação": "4 - Homologação.",
-                "Produção": "5 - Produção",
-                "Concluído": "0 - Concluído",
-                "Systextil": "6 - Systextil",
-            }
-        )
-        df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
-        df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
-        )
-        st.subheader(f"Têxtil - {len(df.index)}")
-        st.dataframe(df, use_container_width=True)
+            df = df[
+                [
+                    "descricao",
+                    "ordem",
+                    "status_agrupado",
+                    "DiasUltStatus",
+                    "apropriacao",
+                ]
+            ]
+            df.replace(
+                {
+                    "Backlog": "1- Baclog",
+                    "Especificação": "2 - Especificação.",
+                    "Desenvolvimento": "3 - Desenvolvimento.",
+                    "Homologação": "4 - Homologação.",
+                    "Produção": "5 - Produção",
+                    "Concluído": "0 - Concluído",
+                    "Systextil": "6 - Systextil",
+                },
+                inplace=True,
+            )
+            df = df.sort_values(
+                by=["ordem", "status_agrupado", "DiasUltStatus"],
+                ascending=[False, True, True],
+            )
+            df = df.style.apply(colorir_linha, axis=1).format(
+                {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
+            )
+            st.subheader(f"Comercial - {len(df.index)}")
+            st.dataframe(df, use_container_width=True, height=2000)
 
-        ### CRL ###
-        df = df_prioridade.loc[
-            (df_prioridade.tipo_agrupado == "Evolutivo") & (df_prioridade.pai == "CRL")
-        ]
-        df["ordem"].fillna(4, inplace=True)
-        df = df.loc[
-            (df.ordem != 4)
-            | (df.status_agrupado != "Concluído")
-            | (df.criado > "20231213")
-        ]
-        df = df[
-            ["descricao", "ordem", "status_agrupado", "DiasUltStatus", "apropriacao"]
-        ]
-        df = df.replace(
-            {
-                "Backlog": "1- Baclog",
-                "Especificação": "2 - Especificação.",
-                "Desenvolvimento": "3 - Desenvolvimento.",
-                "Homologação": "4 - Homologação.",
-                "Produção": "5 - Produção",
-                "Concluído": "0 - Concluído",
-                "Systextil": "6 - Systextil",
-            }
-        )
-        df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
-        df = df.style.apply(colorir_linha, axis=1).format(
-            {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
-        )
-        st.subheader(f"CRL - {len(df.index)}")
-        st.dataframe(df, use_container_width=True)
+        with tab5:
+            ### Têxtil ###
+            df = df_prioridade.loc[
+                (df_prioridade.tipo_agrupado == "Evolutivo")
+                & (df_prioridade.pai == "Têxtil")
+            ]
+            df["ordem"].fillna(4, inplace=True)
+            df = df.loc[
+                (df.ordem != 4)
+                | (df.status_agrupado != "Concluído")
+                | (df.criado > "20231213")
+            ]
+            df = df[
+                [
+                    "descricao",
+                    "ordem",
+                    "status_agrupado",
+                    "DiasUltStatus",
+                    "apropriacao",
+                ]
+            ]
+            df = df.replace(
+                {
+                    "Backlog": "1- Baclog",
+                    "Especificação": "2 - Especificação.",
+                    "Desenvolvimento": "3 - Desenvolvimento.",
+                    "Homologação": "4 - Homologação.",
+                    "Produção": "5 - Produção",
+                    "Concluído": "0 - Concluído",
+                    "Systextil": "6 - Systextil",
+                }
+            )
+            df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
+            df = df.style.apply(colorir_linha, axis=1).format(
+                {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
+            )
+            st.subheader(f"Têxtil - {len(df.index)}")
+            st.dataframe(df, use_container_width=True, height=2000)
+
+        with tab6:
+            ### CRL ###
+            df = df_prioridade.loc[
+                (df_prioridade.tipo_agrupado == "Evolutivo")
+                & (df_prioridade.pai == "CRL")
+            ]
+            df["ordem"].fillna(4, inplace=True)
+            df = df.loc[
+                (df.ordem != 4)
+                | (df.status_agrupado != "Concluído")
+                | (df.criado > "20231213")
+            ]
+            df = df[
+                [
+                    "descricao",
+                    "ordem",
+                    "status_agrupado",
+                    "DiasUltStatus",
+                    "apropriacao",
+                ]
+            ]
+            df = df.replace(
+                {
+                    "Backlog": "1- Baclog",
+                    "Especificação": "2 - Especificação.",
+                    "Desenvolvimento": "3 - Desenvolvimento.",
+                    "Homologação": "4 - Homologação.",
+                    "Produção": "5 - Produção",
+                    "Concluído": "0 - Concluído",
+                    "Systextil": "6 - Systextil",
+                }
+            )
+            df = df.sort_values(by=["ordem", "status_agrupado", "DiasUltStatus"])
+            df = df.style.apply(colorir_linha, axis=1).format(
+                {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
+            )
+            st.subheader(f"CRL - {len(df.index)}")
+            st.dataframe(df, use_container_width=True, height=2000)
 
     ### Dados ###
     with tab3:
