@@ -301,10 +301,19 @@ def quarta_linha():
     )
     a2.metric(
         label="Produção",
-        value=df.loc["4 - Produção"].Quantidade.item(),
+        value=(
+            df.loc["4 - Produção"].Quantidade.item()
+            if "4 - Produção" in df.index
+            else 0
+        ),
         delta=(
             df.loc["4 - Produção"].Quantidade.item()
-            - df7.loc["4 - Produção"].Quantidade.item()
+            if "4 - Produção" in df.index
+            else (
+                0 - df7.loc["4 - Produção"].Quantidade.item()
+                if "4 - Produção" in df7.index
+                else 0
+            )
         ),
     )
 
