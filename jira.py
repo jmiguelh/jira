@@ -82,19 +82,26 @@ def carrega_status(chave: "str"):
         password=os.getenv("API_KEY"),
         cloud=True,
     )
-    status = jira.get_issue_changelog(chave, limit=5000)
+    status = jira.get_issue_changelog(
+        chave,
+        limit=5000,
+    )
 
     for s in status["histories"]:
         if s["items"][0]["field"] == "status" or s["items"][0]["field"] == "resolution":
             inserir_db_status(
                 s["id"],
                 chave,
-                s["items"][0]["fromString"]
-                if s["items"][0]["fromString"] != None
-                else s["items"][1]["fromString"],
-                s["items"][0]["toString"]
-                if s["items"][0]["toString"] != None
-                else s["items"][1]["toString"],
+                (
+                    s["items"][0]["fromString"]
+                    if s["items"][0]["fromString"] != None
+                    else s["items"][1]["fromString"]
+                ),
+                (
+                    s["items"][0]["toString"]
+                    if s["items"][0]["toString"] != None
+                    else s["items"][1]["toString"]
+                ),
                 s["created"],
             )
 
@@ -112,9 +119,11 @@ def listar_cards(cards: "dict"):
             card["fields"]["status"]["name"],
             card["fields"]["created"],
             card["fields"]["updated"],
-            card["fields"]["parent"]["fields"]["summary"]
-            if "parent" in card["fields"]
-            else "",
+            (
+                card["fields"]["parent"]["fields"]["summary"]
+                if "parent" in card["fields"]
+                else ""
+            ),
             card["fields"]["timespent"],
             card["fields"]["status"]["statusCategory"]["name"],
             card["fields"]["statuscategorychangedate"],
@@ -176,13 +185,17 @@ def inserir_db_cards(cards: "dict"):
                     status_agrupado=agrupar_status(card["fields"]["status"]["name"]),
                     criado=datetime.strptime(card["fields"]["created"], FORMATO_DATA),
                     alterado=datetime.strptime(card["fields"]["updated"], FORMATO_DATA),
-                    pai=card["fields"]["parent"]["fields"]["summary"]
-                    if "parent" in card["fields"]
-                    else "",
+                    pai=(
+                        card["fields"]["parent"]["fields"]["summary"]
+                        if "parent" in card["fields"]
+                        else ""
+                    ),
                     tempo_total=card["fields"]["timespent"],
-                    categoria=card["fields"]["status"]["statusCategory"]["name"]
-                    if not card["fields"]["status"]["name"] == "Concluído"
-                    else "Concluído",
+                    categoria=(
+                        card["fields"]["status"]["statusCategory"]["name"]
+                        if not card["fields"]["status"]["name"] == "Concluído"
+                        else "Concluído"
+                    ),
                     categoria_alterada=datetime.strptime(
                         card["fields"]["statuscategorychangedate"], FORMATO_DATA
                     ),

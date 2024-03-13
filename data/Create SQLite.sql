@@ -66,3 +66,27 @@ CREATE TABLE "jira_prioridade" (
   "chave" VARCHAR(10) NOT NULL PRIMARY KEY,
   "ordem" INTEGER NOT NULL
 );
+
+DROP VIEW jira_vw_lead_time;
+
+CREATE VIEW jira_vw_lead_time AS
+    SELECT c.chave,
+           c.tipo_agrupado,
+           c.status,
+           (
+               SELECT max(s.datahora) 
+                 FROM jira_status AS s
+                WHERE s.chave = c.chave AND 
+                      s.para = "Aprovado"
+           )
+           AS inicio,
+           (
+               SELECT max(s.datahora) 
+                 FROM jira_status AS s
+                WHERE s.chave = c.chave AND 
+                      s.para = "Done"
+           )
+           AS fim
+      FROM jira_card AS c
+     WHERE c.status = "Concluído"
+     ORDER BY inicio;

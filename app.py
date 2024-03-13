@@ -431,7 +431,7 @@ def main():
             df = df.loc[
                 (df.ordem != 0)
                 | (df.status_agrupado != "Concluído")
-                | (df.criado > "20231213")
+                | (df.criado > "20240313")
             ]
 
             df = df[

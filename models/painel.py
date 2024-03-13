@@ -324,6 +324,50 @@ def total_cards_tipo(dias: int = 0) -> pd.DataFrame:
     return df
 
 
+@db_session
+def carregar_tempo() -> pd.DataFrame:
+    sql = """SELECT a.chave,
+                a.de AS status,
+                CAST ( (
+                    SELECT JULIANDAY(a.datahora) - JULIANDAY(b.datahora) 
+                        FROM jira_status AS b
+                        WHERE a.chave = b.chave AND 
+                            b.id < a.id
+                        ORDER BY b.id
+                        LIMIT 1
+                )
+                AS INT) AS tempo
+            FROM jira_status AS a;"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "chave",
+            "status",
+            "tempo",
+        ],
+    )
+    return df
+
+
+@db_session
+def carregar_lead_time() -> pd.DataFrame:
+    sql = """SELECT chave,
+                CAST(JULIANDAY(fim) - JULIANDAY(inicio) AS INT) as leadtime
+            FROM jira_vw_lead_time
+            WHERE inicio NOT NULL
+            ORDER BY leadtime"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "chave",
+            "leadtime",
+        ],
+    )
+    return df
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
