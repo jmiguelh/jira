@@ -401,7 +401,9 @@ def main():
 
     st.title("Salesforce Squad")
 
-    tab1, tab2, tab3 = st.tabs(["Gráficos", "Prioridade", "Dados"])
+    tab1, tab2, tab3, tab_analise = st.tabs(
+        ["Gráficos", "Prioridade", "Dados", "Análise"]
+    )
     ### Gráficos ###
     with tab1:
         primeira_linha()
@@ -549,6 +551,87 @@ def main():
         st.write("Cards")
         df_cards_filtrados["tempo_total"] = df_cards_filtrados["tempo_total"] / 3600
         st.dataframe(df_cards_filtrados, hide_index=True)
+
+    ### Análise ###
+    with tab_analise:
+        corpo = st.container()
+        corpo.write("Lead Time Total")
+        df = painel.carregar_lead_time()
+        df = painel.trata_lead_time(df)
+
+        fig = px.bar(
+            df,
+            x="leadtime",
+            y="count",
+            # color="Tipo",
+            text_auto=True,
+            color_discrete_sequence=px.colors.qualitative.Set2,
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.5),
+            line_width=2,
+            line_dash="dash",
+            line_color="black",
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.8),
+            line_width=2,
+            line_dash="dot",
+            line_color="black",
+        )
+        corpo.plotly_chart(fig, use_container_width=True)
+
+        corpo.write("Lead Time Evolutivo")
+        df = painel.carregar_lead_time()
+        df = painel.trata_lead_time(df.loc[df.tipo == "Evolutivo"])
+
+        fig = px.bar(
+            df,
+            x="leadtime",
+            y="count",
+            # color="Tipo",
+            text_auto=True,
+            # color_discrete_sequence=px.colors.qualitative.Set1,
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.5),
+            line_width=2,
+            line_dash="dash",
+            line_color="black",
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.8),
+            line_width=2,
+            line_dash="dot",
+            line_color="black",
+        )
+        corpo.plotly_chart(fig, use_container_width=True)
+
+        corpo.write("Lead Time Corretivo")
+        df = painel.carregar_lead_time()
+        df = painel.trata_lead_time(df.loc[df.tipo == "Corretivo"])
+
+        fig = px.bar(
+            df,
+            x="leadtime",
+            y="count",
+            # color="Tipo",
+            text_auto=True,
+            color_discrete_sequence=px.colors.qualitative.Set1,
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.5),
+            line_width=2,
+            line_dash="dash",
+            line_color="black",
+        )
+        fig.add_vline(
+            x=painel.pecent_lead_time(df, 0.8),
+            line_width=2,
+            line_dash="dot",
+            line_color="black",
+        )
+        corpo.plotly_chart(fig, use_container_width=True)
 
 
 if __name__ == "__main__":

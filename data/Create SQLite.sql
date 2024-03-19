@@ -72,14 +72,17 @@ DROP VIEW jira_vw_lead_time;
 CREATE VIEW jira_vw_lead_time AS
     SELECT c.chave,
            c.tipo_agrupado,
-           c.status,
-           (
-               SELECT max(s.datahora) 
-                 FROM jira_status AS s
-                WHERE s.chave = c.chave AND 
-                      s.para = "Aprovado"
-           )
-           AS inicio,
+           IFNULL( (
+                       SELECT max(s.datahora) 
+                         FROM jira_status AS s
+                        WHERE s.chave = c.chave AND 
+                              s.para = "Aprovado"
+                   ), (
+                       SELECT min(s.datahora) 
+                         FROM jira_status AS s
+                        WHERE s.chave = c.chave
+                   )
+           ) AS inicio,
            (
                SELECT max(s.datahora) 
                  FROM jira_status AS s
@@ -88,5 +91,4 @@ CREATE VIEW jira_vw_lead_time AS
            )
            AS fim
       FROM jira_card AS c
-     WHERE c.status = "Concluído"
-     ORDER BY inicio;
+     WHERE c.status = "Concluído";
