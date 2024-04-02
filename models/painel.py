@@ -324,6 +324,66 @@ def total_cards_tipo(dias: int = 0) -> pd.DataFrame:
     return df
 
 
+@db_session
+def carregar_tempo() -> pd.DataFrame:
+    sql = """SELECT a.chave,
+                a.de AS status,
+                CAST ( (
+                    SELECT JULIANDAY(a.datahora) - JULIANDAY(b.datahora) 
+                        FROM jira_status AS b
+                        WHERE a.chave = b.chave AND 
+                            b.id < a.id
+                        ORDER BY b.id
+                        LIMIT 1
+                )
+                AS INT) AS tempo
+            FROM jira_status AS a;"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "chave",
+            "status",
+            "tempo",
+        ],
+    )
+    return df
+
+
+@db_session
+def carregar_lead_time() -> pd.DataFrame:
+    sql = """SELECT chave,
+                tipo_agrupado,
+                CAST(JULIANDAY(fim) - JULIANDAY(inicio) AS INT) as leadtime
+            FROM jira_vw_lead_time
+            WHERE inicio NOT NULL
+            ORDER BY leadtime"""
+    result = db.select(sql)
+    df = pd.DataFrame(
+        result,
+        columns=[
+            "chave",
+            "tipo",
+            "leadtime",
+        ],
+    )
+    return df
+
+
+def trata_lead_time(df: pd.DataFrame) -> pd.DataFrame:
+    df = df["leadtime"].value_counts().to_frame().sort_index().reset_index()
+    df["acumulado"] = df["count"].cumsum()
+    return df
+
+
+def pecent_lead_time(df: pd.DataFrame, pecentual: float) -> int:
+    return (
+        df.loc[df.acumulado < (df["count"].sum() * pecentual)]
+        .tail(1)["leadtime"]
+        .values[0]
+    )
+
+
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)
