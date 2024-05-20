@@ -477,7 +477,7 @@ def main():
             df = df.loc[
                 (df.ordem != 4)
                 | (df.status_agrupado != "Concluído")
-                | (df.criado > "20231213")
+                | (df.criado > "20240501")
             ]
             df = df[
                 [
