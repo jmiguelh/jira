@@ -307,6 +307,8 @@ def agrupar_tipo(tipo: "str") -> str:
             retorno = "Evolutivo"
         case "Nova função":
             retorno = "Evolutivo"
+        case "Suporte":
+            retorno = "Suporte"
     return retorno
 
 
