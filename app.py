@@ -146,7 +146,7 @@ def segunda_linha():
     a.write("% Apropriação por tipo")
     fig = px.bar(
         painel.apropriacao_por_tipo(),
-        x=["Corretivo", "Evolutivo"],
+        x=["Corretivo", "Evolutivo", "Suporte"],
         y="Mês",
         text_auto=True,
         orientation="h",

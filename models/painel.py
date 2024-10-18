@@ -1,5 +1,4 @@
-from datetime import datetime
-from pony.orm import *
+from pony.orm import Database, db_session  
 import pandas as pd
 
 
@@ -226,7 +225,11 @@ def apropriacao_por_tipo() -> pd.DataFrame:
                 cast((cast(sum(CASE
                     WHEN tipo_agrupado = "Corretivo" THEN tempo
                     ELSE 0
-                END) as float) / cast(sum(tempo)as float))* 100 as int) AS Corretivo
+                END) as float) / cast(sum(tempo)as float))* 100 as int) AS Corretivo,
+                cast((cast(sum(CASE
+                    WHEN tipo_agrupado = "Suporte" THEN tempo
+                    ELSE 0
+                END) as float) / cast(sum(tempo)as float))* 100 as int) AS Suporte
             FROM jira_card as c
             INNER JOIN jira_apropriacao as a 
             ON c.id = a.card_id
@@ -235,7 +238,7 @@ def apropriacao_por_tipo() -> pd.DataFrame:
             ORDER BY 1 DESC
             LIMIT 6"""
     result = db.select(sql)
-    df = pd.DataFrame(result, columns=["Mês", "Evolutivo", "Corretivo"])
+    df = pd.DataFrame(result, columns=["Mês", "Evolutivo", "Corretivo", "Suporte"])
     # df = df.set_index("Mes")
     return df
 
