@@ -262,6 +262,7 @@ def apropriacao_por_pai() -> pd.DataFrame:
                 INNER JOIN jira_apropriacao as a 
                 ON c.id = a.card_id
                 WHERE c.status_agrupado not in ('Cancelado', 'Systextil')
+                  AND c.tipo <> "Suporte"
                 GROUP BY strftime('%Y-%m',inicio)
                 ORDER BY 1 DESC
                 LIMIT 6"""
