@@ -1,4 +1,4 @@
-from pony.orm import Database, db_session  
+from pony.orm import Database, db_session
 import pandas as pd
 
 

@@ -1,6 +1,5 @@
 from datetime import datetime
-from pony.orm import *
-
+from pony.orm import Database, PrimaryKey, Required, Optional, db_session, commit
 
 db = Database()
 
@@ -59,7 +58,7 @@ def diario():
         DELETE FROM jira_diario
         WHERE  data = DATE('now');
         """
-    cursor = db.execute(sql)
+    db.execute(sql)
     commit()
     sql = """
         INSERT INTO jira_diario
@@ -67,7 +66,7 @@ def diario():
         FROM jira_card
         GROUP BY status_agrupado, pai, tipo_agrupado
         """
-    cursor = db.execute(sql)
+    db.execute(sql)
 
 
 class Prioridade(db.Entity):
