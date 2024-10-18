@@ -75,9 +75,12 @@ class Prioridade(db.Entity):
     ordem = Required(int, default=0)
 
 
-# result = db.select("select * from jira_card where status_agrupado <> 'Cancelado'")
-# colunas = ['id', 'chave', 'tipo', 'desricao', 'prioridade', 'status', 'criado', 'alterado', 'pai', 'tempo_total', 'categoria', 'categoria_alterada', 'status_agrupado', 'tipo_agrupado']
-# a = pd.DataFrame(resultcolumns=colunas)
+@db_session
+def ultima_apropriacao() -> str:
+    sql = """SELECT max(alterado)
+             FROM jira_apropriacao;"""
+    result = db.select(sql)
+    return result[0]
 
 
 db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)

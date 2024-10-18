@@ -3,7 +3,15 @@ from dotenv import load_dotenv
 from atlassian import Jira
 from datetime import datetime
 import time
-from models.db import *
+from models.db import (
+    Card,
+    Status,
+    Apropriacao,
+    Controle,
+    diario,
+    db_session,
+    ultima_apropriacao,
+)
 import log.log as log
 
 FORMATO_DATA = "%Y-%m-%dT%H:%M:%S.%f%z"
@@ -62,7 +70,11 @@ def carrega_apropriacoes() -> dict:
     )
 
     with db_session:
-        ultima = time.mktime(max(a.alterado for a in Apropriacao).timetuple())
+        ultima = time.mktime(
+            datetime.strptime(
+                ultima_apropriacao(), "%Y-%m-%d %H:%M:%S.%f%z"
+            ).timetuple()
+        )
 
     apropriacoes = jira.get_updated_worklogs(since=ultima + 1)
 
@@ -86,24 +98,27 @@ def carrega_status(chave: "str"):
         chave,
         limit=5000,
     )
-
-    for s in status["histories"]:
-        if s["items"][0]["field"] == "status" or s["items"][0]["field"] == "resolution":
-            inserir_db_status(
-                s["id"],
-                chave,
-                (
-                    s["items"][0]["fromString"]
-                    if s["items"][0]["fromString"] != None
-                    else s["items"][1]["fromString"]
-                ),
-                (
-                    s["items"][0]["toString"]
-                    if s["items"][0]["toString"] != None
-                    else s["items"][1]["toString"]
-                ),
-                s["created"],
-            )
+    if "histories" in status:
+        for s in status["histories"]:
+            if (
+                s["items"][0]["field"] == "status"
+                or s["items"][0]["field"] == "resolution"
+            ):
+                inserir_db_status(
+                    s["id"],
+                    chave,
+                    (
+                        s["items"][0]["fromString"]
+                        if s["items"][0]["fromString"] is not None
+                        else s["items"][1]["fromString"]
+                    ),
+                    (
+                        s["items"][0]["toString"]
+                        if s["items"][0]["toString"] is not None
+                        else s["items"][1]["toString"]
+                    ),
+                    s["created"],
+                )
 
 
 def listar_cards(cards: "dict"):
@@ -134,7 +149,7 @@ def inserir_db_cards(cards: "dict"):
     with db_session(optimistic=False):
         for card in cards:
             c = Card.get(id=card["id"])
-            if not c == None:
+            if c is not None:
                 if not c.alterado == datetime.strptime(
                     card["fields"]["updated"][:23], "%Y-%m-%dT%H:%M:%S.%f"
                 ):
@@ -208,7 +223,7 @@ def inserir_db_apropriacoes(apropriacoes: "dict"):
     with db_session(optimistic=False):
         for apropriacao in apropriacoes:
             a = Apropriacao.get(id=apropriacao["id"])
-            if not a == None:
+            if a is not None:
                 log.logar(
                     "APROPRIAÇÃO", f"Apropriação alterada: {apropriacao['issueId']}"
                 )
@@ -233,7 +248,7 @@ def inserir_db_apropriacoes(apropriacoes: "dict"):
 def inserir_db_status(id: "int", chave: "str", de: "str", para: "str", datahora: "str"):
     with db_session:
         s = Status.get(id=id)
-        if s == None:
+        if s is None:
             log.logar("STATUS", f"Status alterado: {chave}")
             Status(
                 id=id,

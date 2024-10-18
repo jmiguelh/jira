@@ -4,6 +4,7 @@ import plotly.express as px
 import time
 import jira
 import models.painel as painel
+from models.db import ultima_atualzacao
 
 TIPO = ["Todos", "Evolutivo", "Corretivo"]
 SETOR = ["Todos", "CRL", "Comercial", "Têxtil"]
@@ -27,7 +28,7 @@ def barra_lateral():
             tipo = st.selectbox("Tipo:", TIPO)
             status = st.multiselect("Status:", STATUS, default=STATUS)
         with st.expander(
-            f":arrows_counterclockwise: Última atualização: {jira.ultima_atualzacao()}"
+            f":arrows_counterclockwise: Última atualização: {ultima_atualzacao()}"
         ):
             if st.button("Recarregar dados"):
                 with st.spinner("Carregando..."):
