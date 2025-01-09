@@ -70,11 +70,7 @@ def carrega_apropriacoes() -> dict:
     )
 
     with db_session:
-        ultima = time.mktime(
-            datetime.strptime(
-                ultima_apropriacao(), "%Y-%m-%d %H:%M:%S.%f%z"
-            ).timetuple()
-        )
+        ultima = time.mktime(ultima_apropriacao().timetuple())
 
     apropriacoes = jira.get_updated_worklogs(since=ultima + 1)
 
