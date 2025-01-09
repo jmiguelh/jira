@@ -1,4 +1,7 @@
+import os
 from datetime import datetime
+
+from dotenv import load_dotenv
 from pony.orm import Database, PrimaryKey, Required, Optional, db_session, commit
 
 db = Database()
@@ -83,6 +86,15 @@ def ultima_apropriacao() -> str:
     return result[0]
 
 
-db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
+load_dotenv()
+
+db.bind(
+    provider="postgres",
+    user=os.getenv("POSTGRESQL_USR"),
+    password=os.getenv("POSTGRESQL_PWD"),
+    host="sf.lunelli.com.br",
+    database="jira",
+)
+# db.bind(provider="sqlite", filename="../data/db.sqlite", create_db=True)
 
 db.generate_mapping(create_tables=True)

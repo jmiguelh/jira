@@ -14,6 +14,7 @@ streamlit = "^1.29.0"
 plotly = "^5.18.0"
 atlassian-python-api = "^3.41.4"
 schedule = "^1.2.1"
+psycopg2-binary = "^2.9.10"
 
 
 [tool.poetry.group.dev.dependencies]
