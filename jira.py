@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from atlassian import Jira
-from datetime import datetime
+from datetime import datetime, timezone
 import time
 from models.db import (
     Card,
@@ -94,8 +94,8 @@ def carrega_status(chave: "str"):
         chave,
         limit=5000,
     )
-    if "histories" in status:
-        for s in status["histories"]:
+    if "values" in status:
+        for s in status["values"]:
             if (
                 s["items"][0]["field"] == "status"
                 or s["items"][0]["field"] == "resolution"
@@ -146,9 +146,10 @@ def inserir_db_cards(cards: "dict"):
         for card in cards:
             c = Card.get(id=card["id"])
             if c is not None:
-                if not c.alterado == datetime.strptime(
-                    card["fields"]["updated"][:23], "%Y-%m-%dT%H:%M:%S.%f"
-                ):
+                dt1 = c.alterado
+                dt2 = datetime.strptime(card["fields"]["updated"], FORMATO_DATA)
+                dt1_aware = dt1.replace(tzinfo=timezone.utc).astimezone(dt2.tzinfo)
+                if not dt1_aware == dt2:
                     # Atualiza campos
                     log.logar("CARD", f"Card alterado: {c.chave}")
                     c.tipo = card["fields"]["issuetype"]["name"]
