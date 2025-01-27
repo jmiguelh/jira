@@ -143,7 +143,7 @@ def cards_por_mes() -> pd.DataFrame:
                     COUNT(1) AS Cards
                 FROM jira_card
                 WHERE status_agrupado NOT IN ('Cancelado', 'Systextil')
-                    AND criado > (CURRENT_DATE - INTERVAL '5 months')
+                    AND criado > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '5 months'))
                 GROUP BY TO_CHAR(criado, 'YYYY-MM'), tipo_agrupado
                 ORDER BY 1 DESC;"""
     result = db.select(sql)
@@ -161,7 +161,7 @@ def cards_concluido_por_mes() -> pd.DataFrame:
                     tipo_agrupado,
                     COUNT(1) AS Cards
                 FROM jira_vw_data_conclusao
-                WHERE data_conclusao > (CURRENT_DATE - INTERVAL '5 months')
+                WHERE data_conclusao > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '5 months'))
                 GROUP BY TO_CHAR(data_conclusao, 'YYYY-MM'), tipo_agrupado
                 ORDER BY 1 DESC;"""
     result = db.select(sql)
