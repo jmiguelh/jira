@@ -3,7 +3,7 @@ name = "jira"
 version = "1.2.2"
 description = ""
 authors = [{ name = "Miguel Henriques", email = "github@jmh.com.br" }]
-requires-python = ">=3.11, <4"
+requires-python = "~=3.11"
 readme = "README.md"
 dependencies = [
     "requests>=2.31.0,<3",
@@ -11,7 +11,7 @@ dependencies = [
     "pony>=0.7.17,<0.8",
     "streamlit>=1.29.0,<2",
     "plotly>=5.18.0,<6",
-    "atlassian-python-api>=3.41.4, <5",
+    "atlassian-python-api>=3.41.4",
     "schedule>=1.2.1,<2",
     "psycopg2-binary>=2.9.10,<3",
 ]

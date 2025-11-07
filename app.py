@@ -117,7 +117,7 @@ def primeira_linha():
             x=1,
         )
     )
-    b.plotly_chart(fig, width=True)
+    b.plotly_chart(fig, use_container_width=True)
 
     fig = px.pie(
         painel.cards_por_setor(),
@@ -137,7 +137,7 @@ def primeira_linha():
         )
     )
     c.write("Cards aberto por setor")
-    c.plotly_chart(fig, width=True)
+    c.plotly_chart(fig, use_container_width=True)
 
 
 def segunda_linha():
@@ -163,7 +163,7 @@ def segunda_linha():
             x=1,
         )
     )
-    a.plotly_chart(fig, width=True)
+    a.plotly_chart(fig, use_container_width=True)
 
     b.write("Cards concluído por mês")
 
@@ -185,7 +185,7 @@ def segunda_linha():
             x=1,
         )
     )
-    b.plotly_chart(fig, width=True)
+    b.plotly_chart(fig, use_container_width=True)
 
     c.write("Cards concluído no mês por setor")
     fig = px.pie(
@@ -205,7 +205,7 @@ def segunda_linha():
             x=1,
         )
     )
-    c.plotly_chart(fig, width=True)
+    c.plotly_chart(fig, use_container_width=True)
 
 
 def terceira_linha():
@@ -230,7 +230,7 @@ def terceira_linha():
             x=1,
         )
     )
-    a.plotly_chart(fig, width=True)
+    a.plotly_chart(fig, use_container_width=True)
 
     b.write("% Apropriação por Setor")
     fig = px.bar(
@@ -251,7 +251,7 @@ def terceira_linha():
             x=1,
         )
     )
-    b.plotly_chart(fig, width=True)
+    b.plotly_chart(fig, use_container_width=True)
 
 
 def quarta_linha():
@@ -337,7 +337,7 @@ def quarta_linha():
             x=1,
         )
     )
-    b.plotly_chart(fig, width=True)
+    b.plotly_chart(fig, use_container_width=True)
 
 
 def colorir_linha(row):
@@ -466,7 +466,7 @@ def main():
                 {"ordem": "{:.2f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
             )
             st.subheader(f"Comercial - {len(df.index)}")
-            st.dataframe(df, width=True, height=2000)
+            st.dataframe(df, use_container_width=True, height=2000)
 
         with tab5:
             ### Têxtil ###
@@ -505,7 +505,7 @@ def main():
                 {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
             )
             st.subheader(f"Têxtil - {len(df.index)}")
-            st.dataframe(df, width=True, height=2000)
+            st.dataframe(df, use_container_width=True, height=2000)
 
         with tab6:
             ### CRL ###
@@ -544,7 +544,7 @@ def main():
                 {"ordem": "{:.0f}", "DiasUltStatus": "{:.0f}", "apropriacao": "{:.2f}"}
             )
             st.subheader(f"CRL - {len(df.index)}")
-            st.dataframe(df, width=True, height=2000)
+            st.dataframe(df, use_container_width=True, height=2000)
 
     ### Dados ###
     with tab3:
@@ -580,7 +580,7 @@ def main():
             line_dash="dot",
             line_color="black",
         )
-        corpo.plotly_chart(fig, width=True)
+        corpo.plotly_chart(fig, use_container_width=True)
 
         corpo.write("Lead Time Evolutivo")
         df = painel.carregar_lead_time()
@@ -606,7 +606,7 @@ def main():
             line_dash="dot",
             line_color="black",
         )
-        corpo.plotly_chart(fig, width=True)
+        corpo.plotly_chart(fig, use_container_width=True)
 
         corpo.write("Lead Time Corretivo")
         df = painel.carregar_lead_time()
@@ -632,7 +632,7 @@ def main():
             line_dash="dot",
             line_color="black",
         )
-        corpo.plotly_chart(fig, width=True)
+        corpo.plotly_chart(fig, use_container_width=True)
 
 
 if __name__ == "__main__":
