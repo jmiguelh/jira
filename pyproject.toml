@@ -2,12 +2,8 @@
 name = "jira"
 version = "1.2.2"
 description = ""
-<<<<<<< HEAD
 authors = [{ name = "Miguel Henriques", email = "github@jmh.com.br" }]
 requires-python = ">=3.11, <4"
-=======
-authors = ["Miguel Henriques <github@jmh.com.br>"]
->>>>>>> 0be0677 (Revert "Migrado projeto para o uv")
 readme = "README.md"
 
 [tool.poetry.dependencies]
