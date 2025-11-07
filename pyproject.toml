@@ -3,7 +3,7 @@ name = "jira"
 version = "1.2.2"
 description = ""
 authors = [{ name = "Miguel Henriques", email = "github@jmh.com.br" }]
-requires-python = "~=3.11"
+requires-python = ">=3.11, <4"
 readme = "README.md"
 dependencies = [
     "requests>=2.31.0,<3",
