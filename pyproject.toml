@@ -11,7 +11,7 @@ dependencies = [
     "pony>=0.7.17,<0.8",
     "streamlit>=1.29.0,<2",
     "plotly>=5.18.0,<6",
-    "atlassian-python-api>=3.41.4,<4",
+    "atlassian-python-api>=3.41.4",
     "schedule>=1.2.1,<2",
     "psycopg2-binary>=2.9.10,<3",
 ]

@@ -44,20 +44,21 @@ def carrega_cards() -> dict:
         "timespent",
         "statuscategorychangedate",
     ]
-    inicio = 0
     passo = 100
-    total = 1000
-    while inicio < total:
-        issues = jira.jql(
+    proxima = None
+    ultima = False
+    while not ultima:
+        issues = jira.enhanced_jql(
             jql_request,
             limit=passo,
-            start=inicio,
+            nextPageToken=proxima,
             fields=campos,
         )
-        inicio = issues["startAt"] + passo
-        total = issues["total"]
         cards.extend(issues["issues"])
-    log.logar("CARD", f"Total de cards: {total}")
+        ultima = issues["isLast"]
+        if not ultima:
+            proxima = issues["nextPageToken"]
+    log.logar("CARD", f"Total de cards: {len(cards)}")
     return cards
 
 
