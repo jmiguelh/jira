@@ -1,27 +1,31 @@
-[project]
+[tool.poetry]
 name = "jira"
 version = "1.2.2"
 description = ""
+<<<<<<< HEAD
 authors = [{ name = "Miguel Henriques", email = "github@jmh.com.br" }]
 requires-python = ">=3.11, <4"
+=======
+authors = ["Miguel Henriques <github@jmh.com.br>"]
+>>>>>>> 0be0677 (Revert "Migrado projeto para o uv")
 readme = "README.md"
-dependencies = [
-    "requests>=2.31.0,<3",
-    "python-dotenv==1.0.0",
-    "pony>=0.7.17,<0.8",
-    "streamlit>=1.29.0,<2",
-    "plotly>=5.18.0,<6",
-    "atlassian-python-api>=3.41.4,<4",
-    "schedule>=1.2.1,<2",
-    "psycopg2-binary>=2.9.10,<3",
-]
 
-[dependency-groups]
-dev = [
-    "ipython>=8.18.0,<9",
-    "ipykernel>=6.27.1,<7",
-]
+[tool.poetry.dependencies]
+python = "^3.11"
+requests = "^2.31.0"
+python-dotenv = "^1.0.0"
+pony = "^0.7.17"
+streamlit = "^1.29.0"
+plotly = "^5.18.0"
+atlassian-python-api = "^3.41.4"
+schedule = "^1.2.1"
+psycopg2-binary = "^2.9.10"
+
+
+[tool.poetry.group.dev.dependencies]
+ipython = "^8.18.0"
+ipykernel = "^6.27.1"
 
 [build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
