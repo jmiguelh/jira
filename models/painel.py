@@ -143,7 +143,7 @@ def cards_por_mes() -> pd.DataFrame:
                     COUNT(1) AS Cards
                 FROM jira_card
                 WHERE status_agrupado NOT IN ('Cancelado', 'Systextil')
-                    AND criado > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '12 months'))
+                    AND criado > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '5 months'))
                 GROUP BY TO_CHAR(criado, 'YYYY-MM'), tipo_agrupado
                 ORDER BY 1 DESC;"""
     result = db.select(sql)
@@ -161,7 +161,7 @@ def cards_concluido_por_mes() -> pd.DataFrame:
                     tipo_agrupado,
                     COUNT(1) AS Cards
                 FROM jira_vw_data_conclusao
-                WHERE data_conclusao > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '12 months'))
+                WHERE data_conclusao > DATE_TRUNC('month',(CURRENT_DATE - INTERVAL '5 months'))
                 GROUP BY TO_CHAR(data_conclusao, 'YYYY-MM'), tipo_agrupado
                 ORDER BY 1 DESC;"""
     result = db.select(sql)
@@ -245,7 +245,7 @@ def apropriacao_por_tipo() -> pd.DataFrame:
                 WHERE c.status_agrupado NOT IN ('Cancelado', 'Systextil')
                 GROUP BY TO_CHAR(inicio, 'YYYY-MM')
                 ORDER BY 1 DESC
-                LIMIT 12;"""
+                LIMIT 6;"""
     result = db.select(sql)
     df = pd.DataFrame(result, columns=["Mês", "Evolutivo", "Corretivo", "Suporte"])
     # df = df.set_index("Mes")
@@ -274,7 +274,7 @@ def apropriacao_por_pai() -> pd.DataFrame:
                     AND c.tipo <> 'Suporte'
                 GROUP BY TO_CHAR(inicio, 'YYYY-MM')
                 ORDER BY 1 DESC
-                LIMIT 12;"""
+                LIMIT 6;"""
     result = db.select(sql)
     df = pd.DataFrame(result, columns=["Mês", "CRL", "Têxtil", "Comercial"])
     # df = df.set_index("Mes")
