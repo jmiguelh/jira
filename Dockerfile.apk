@@ -1,0 +1,55 @@
+# Usar a imagem mais leve de Python na versão 3.12
+FROM python:3.12-alpine
+
+# Configurar variáveis de ambiente para Python
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+# Configurar o timezone para São Paulo
+ENV TZ=America/Sao_Paulo
+# Atualizar pacotes do sistema e instalar dependências necessárias
+RUN apk add --no-cache \
+    libxml2-dev \
+    libxslt-dev \
+    libffi-dev \
+    libstdc++ \
+    snappy \
+    thrift \
+    utf8proc
+
+# Configurar diretório de trabalho
+WORKDIR /app
+
+# Clonar o repositório do GitHub
+# Utilizando autenticação com token armazenado como ARG
+ARG GITHUB_TOKEN
+RUN apk add --no-cache git --virtual mypacks \
+    && git clone https://$GITHUB_TOKEN@github.com/jmiguelh/jira.git /app \
+    && apk del mypacks
+
+
+# Instalar dependências do projeto
+RUN apk add --no-cache --virtual mypacks \
+    cmake \
+    make \
+    g++ \
+    python3-dev \
+    musl-dev \
+    linux-headers \
+    bash \
+    curl-dev \
+    ninja \
+    re2-dev \
+    rapidjson-dev \
+    snappy-dev \
+    thrift-dev \
+    utf8proc-dev \
+    py3-pyarrow \
+    && pip --no-cache-dir install -r requirements.txt \
+    && apk del mypacks
+
+EXPOSE 9000
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 CMD curl --fail http://localhost:9000/_stcore/health || exit 1
+
+# Comando padrão para executar o aplicativo
+ENTRYPOINT ["streamlit", "run", "/app/app.py", "--server.port=9000", "--server.address=0.0.0.0"]
